@@ -12,9 +12,9 @@ function Home() {
   };
 
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <aside className="w-[260px] flex flex-col justify-between border-r border-gray-200 bg-white py-6 pl-8 pr-4">
+      <aside className="w-[260px] flex flex-col justify-between border-r border-gray-200 bg-gray-50 py-6 pl-8 pr-4">
         <div>
           {/* App Icon */}
           <div className="flex items-center mb-10">

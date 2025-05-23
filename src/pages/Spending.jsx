@@ -1,11 +1,31 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { CategoryPieChart } from '../components/categoryPieChart';
+import { SpendingAreaGraph } from '../components/spendingAreaGraph';
 
 function Spending() {
+  const spendingData = [
+    { month: "Jan", amount: 186 },
+    { month: "Feb", amount: 305 },
+    { month: "Mar", amount: 237 },
+    { month: "Apr", amount: 73 },
+    { month: "May", amount: 209 },
+    { month: "Jun", amount: 214 },
+  ];
+
+  const incomeData = [
+    { month: "Jan", amount: 250 },
+    { month: "Feb", amount: 280 },
+    { month: "Mar", amount: 300 },
+    { month: "Apr", amount: 320 },
+    { month: "May", amount: 350 },
+    { month: "Jun", amount: 380 },
+  ];
+
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <aside className="w-[260px] flex flex-col justify-between border-r border-gray-200 bg-white py-6 pl-8 pr-4">
+      <aside className="w-[260px] flex flex-col justify-between border-r border-gray-200 bg-gray-50 py-6 pl-8 pr-4">
         <div>
           {/* App Icon */}
           <div className="flex items-center mb-10">
@@ -52,49 +72,29 @@ function Spending() {
         </div>
         {/* Main Grid */}
         <div className="flex-1 px-12 py-8">
-          <div className="grid grid-cols-3 grid-rows-3 gap-8 h-full">
+          <div className="grid grid-cols-3 grid-rows-4 gap-4 h-full">
             {/* Spending This Month (large line graph) */}
-            <div className="col-span-2 row-span-2 bg-white border border-gray-400 rounded-2xl p-6 flex flex-col">
-              <span className="mb-2 text-sm">SPENDING THIS MONTH</span>
-              <svg viewBox="0 0 400 200" className="w-full h-48">
-                <polyline
-                  fill="none"
-                  stroke="#000"
-                  strokeWidth="2"
-                  points="10,180 50,120 90,130 130,100 170,110 210,80 250,90 290,60 330,70 370,40"
-                />
-                <text x="10" y="195" fontSize="12">07</text>
-                <text x="50" y="195" fontSize="12">10</text>
-                <text x="90" y="195" fontSize="12">13</text>
-                <text x="130" y="195" fontSize="12">16</text>
-                <text x="170" y="195" fontSize="12">19</text>
-                <text x="210" y="195" fontSize="12">22</text>
-                <text x="250" y="195" fontSize="12">25</text>
-                <text x="290" y="195" fontSize="12">28</text>
-              </svg>
+            <div className="col-span-2 row-span-2">
+              <SpendingAreaGraph 
+                title="SPENDING THIS MONTH"
+                data={spendingData}
+                color="#60a5fa"
+              />
             </div>
             {/* Income This Month (small line graph) */}
-            <div className="col-span-1 row-span-1 bg-white border border-gray-400 rounded-2xl p-6 flex flex-col">
-              <span className="mb-2 text-sm">INCOME THIS MONTH</span>
-              <svg viewBox="0 0 200 120" className="w-full h-24">
-                <polyline
-                  fill="none"
-                  stroke="#000"
-                  strokeWidth="2"
-                  points="10,100 40,80 70,90 100,60 130,70 160,40 190,50"
-                />
-              </svg>
+            <div className="col-span-1 row-span-1">
+              <SpendingAreaGraph 
+                title="INCOME THIS MONTH"
+                data={incomeData}
+                color="#2563eb"
+              />
             </div>
             {/* Category Breakdown (pie chart) */}
             <div className="col-span-1 row-span-2 bg-white border border-gray-400 rounded-2xl p-6 flex flex-col">
               <span className="mb-2 text-sm">CATEGORY BREAKDOWN</span>
-              <svg viewBox="0 0 120 120" className="w-full h-32">
-                <circle cx="60" cy="60" r="50" fill="#eee" stroke="#000" strokeWidth="2" />
-                <path d="M60,60 L60,10 A50,50 0 0,1 110,60 Z" fill="#bbb" stroke="#000" strokeWidth="2" />
-                <path d="M60,60 L110,60 A50,50 0 0,1 60,110 Z" fill="#888" stroke="#000" strokeWidth="2" />
-                <path d="M60,60 L60,110 A50,50 0 0,1 10,60 Z" fill="#555" stroke="#000" strokeWidth="2" />
-                <path d="M60,60 L10,60 A50,50 0 0,1 60,10 Z" fill="#222" stroke="#000" strokeWidth="2" />
-              </svg>
+              <div className="col-span-1 row-span-2">
+                <CategoryPieChart />
+              </div>
             </div>
             {/* Latest Transactions */}
             <div className="col-span-1 row-span-1 bg-white border border-gray-400 rounded-2xl p-6 flex flex-col">
