@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import Sidebar from '../components/sidebar';
+import { Link, useNavigate } from 'react-router-dom';
+import Sidebar from '../components/Sidebar';
+import { ChatInterface } from '../components/ChatInterface';
 
 function Home() {
-  const [query, setQuery] = useState('');
+  const [showChat, setShowChat] = useState(false);
+  const [initialQuery, setInitialQuery] = useState('');
+  const navigate = useNavigate();
 
-  const handleSend = () => {
-    if (query.trim() === '') return;
-    // TODO: Replace with your actual send logic
-    console.log('Send:', query);
-    setQuery('');
+  const handleInitialSend = (e) => {
+    e.preventDefault();
+    if (initialQuery.trim() === '') return;
+    navigate('/chat', { state: { initialMessage: initialQuery } });
   };
 
   return (
@@ -32,40 +34,42 @@ function Home() {
             </div>
           </div>
         </div>
-        {/* Centered Content */}
-        <div className="flex flex-col items-center justify-center flex-1">
-          <div className="mt-8 mb-8">
-            <h2 className="text-[28px] font-regular text-center mb-8">What do you want to know?</h2>
-            <div className="w-[720px] max-w-full mx-auto">
-              <div className="relative bg-white border border-gray-300 rounded-2xl shadow-sm h-48 flex flex-col justify-between">
-                {/* Interactive input */}
-                <input
-                  className="absolute top-8 left-8 bg-transparent outline-none border-none text-gray-400 text-[18px] w-2/3"
-                  placeholder="Ask anything ...."
-                  value={query}
-                  onChange={e => setQuery(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter') handleSend(); }}
-                />
-                {/* Bottom row for icons */}
-                <div className="flex items-center justify-between px-8 pb-4 w-full absolute left-0 bottom-0">
-                  <button type="button" aria-label="Add" className="focus:outline-none">
-                    <img src="/icons/plus-icon.svg" alt="Plus" className="w-5 h-5" />
-                  </button>
-                  <button type="button" aria-label="Send" onClick={handleSend} className="w-12 h-12 flex items-center justify-center rounded-xl bg-gray-200 hover:bg-gray-300 transition focus:outline-none">
-                    <img src="/icons/send-icon.svg" alt="Send" className="w-5 h-5" />
-                  </button>
-                </div>
+
+        {!showChat ? (
+          // Initial Search Interface
+          <div className="flex flex-col items-center justify-center flex-1">
+            <div className="mt-8 mb-8">
+              <h2 className="text-[28px] font-regular text-center mb-8">What do you want to know?</h2>
+              <div className="w-[720px] max-w-full mx-auto">
+                <form onSubmit={handleInitialSend} className="relative bg-white border border-gray-300 rounded-2xl shadow-sm h-48 flex flex-col justify-between">
+                  <input
+                    className="absolute top-8 left-8 bg-transparent outline-none border-none text-gray-400 text-[18px] w-2/3"
+                    placeholder="Ask anything ...."
+                    value={initialQuery}
+                    onChange={e => setInitialQuery(e.target.value)}
+                  />
+                  <div className="flex items-center justify-between px-8 pb-4 w-full absolute left-0 bottom-0">
+                    <button type="button" aria-label="Add" className="focus:outline-none">
+                      <img src="/icons/plus-icon.svg" alt="Plus" className="w-5 h-5" />
+                    </button>
+                    <button 
+                      type="submit"
+                      aria-label="Send" 
+                      className="w-12 h-12 flex items-center justify-center rounded-xl bg-gray-200 hover:bg-gray-300 transition focus:outline-none"
+                    >
+                      <img src="/icons/send-icon.svg" alt="Send" className="w-5 h-5" />
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
-          {/* Placeholder Cards */}
-          <div className="flex gap-6 mt-4 w-[90%] max-w-6xl justify-center">
-            <div className="w-64 h-36 bg-gray-200 rounded-xl" />
-            <div className="w-64 h-36 bg-gray-200 rounded-xl" />
-            <div className="w-64 h-36 bg-gray-200 rounded-xl" />
-            <div className="w-64 h-36 bg-gray-200 rounded-xl" />
+        ) : (
+          // Chat Interface
+          <div className="flex-1 bg-white border-t border-gray-200">
+            <ChatInterface initialMessage={initialQuery} />
           </div>
-        </div>
+        )}
       </main>
     </div>
   );

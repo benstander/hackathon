@@ -4,6 +4,8 @@ import { CategoryPieChart } from '../components/categoryPieChart';
 import { SpendingAreaGraph } from '../components/spendingAreaGraph';
 import { Link } from 'react-router-dom';
 import { IncomeChart } from '../components/incomeChart';
+import { BudgetChart } from '../components/budgetChart';
+import { DonutPieChart } from '../components/donutPieChart';
 
 function Overview() {
   const spendingData = [
@@ -26,21 +28,21 @@ function Overview() {
 
 
 
-  function IncomeCard({ label, earned, projected }) {
-    const percent = Math.min((earned / projected) * 100, 100);
+  function IncomeCard({ label, earned }) {
     return (
-      <div className="bg-white border rounded-2xl p-6 flex flex-col justify-between h-full shadow h-[220px]">
-        <span className="mb-2 text-sm">{label}</span>
-        <div className="flex items-end gap-2 mt-4">
-          <span className="text-2xl text-gray-400 font-regular">${earned}</span>
-          <span className="text-2xl text-gray-400 font-regular">/</span>
-          <span className="text-3xl font-medium">${projected}</span>
-        </div>
-        <div className="mt-4 w-full h-1.5 bg-gray-200 rounded-full shadow">
-          <div
-            className="h-1.5 bg-black rounded-full"
-            style={{ width: `${percent}%` }}
-          />
+      <div className="bg-white border rounded-[20px] p-6 flex flex-col shadow">
+        <span className="mb-4 text-sm">{label}</span>
+        <span className="text-2xl font-regular text-black">${earned}</span>
+      </div>
+    );
+  }
+
+  function SpendingCard() {
+    return (
+      <div className="bg-white border rounded-[20px] p-6 flex flex-col shadow h-[400px]">
+        <span className="mb-4 text-sm">TOTAL SPENDING</span>
+        <div className="flex-1 flex flex-col justify-end">
+          <BudgetChart />
         </div>
       </div>
     );
@@ -69,8 +71,8 @@ function Overview() {
             {/* Left section: Spending and Transactions */}
             <div className="col-span-2 flex flex-col gap-4 h-full">
               <div className="bg-white border rounded-[20px] p-6 flex flex-col flex-1 min-h-[300px] shadow">
-                <span className="mb-2 text-sm">SPENDING THIS MONTH</span>
-                <SpendingAreaGraph title="" data={spendingData} color="#000" />
+                <span className="mb-2 text-sm">CURRENT BALANCE</span>
+                <SpendingAreaGraph title="" data={spendingData} color="#008000" />
               </div>
               <div className="grid grid-cols-2 gap-4 flex-1 min-h-[220px]">
                 <div className="bg-white border rounded-[20px] p-6 flex flex-col shadow">
@@ -83,9 +85,9 @@ function Overview() {
             </div>
             {/* Right section: Income and Category Breakdown */}
             <div className="col-span-1 flex flex-col gap-4 h-full">
-              <IncomeCard label="INCOME THIS MONTH" earned={2000} projected={3000} />
+              <SpendingCard />
               <div className="bg-white border rounded-[20px] p-6 flex flex-col flex-1 shadow">
-                <span className="mb-2 text-sm">CATEGORY BREAKDOWN</span>
+                <span className="mb-4 text-sm">SPENDING BREAKDOWN</span>
                 <CategoryPieChart />
               </div>
             </div>

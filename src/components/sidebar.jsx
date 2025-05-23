@@ -12,14 +12,14 @@ export default function Sidebar() {
         </div>
         <nav className="flex flex-col gap-4">
           <Link
-            to="/"
-            className={`flex items-center gap-3 text-black font-regular hover:text-black px-4 py-2 rounded-[10px] ${location.pathname === '/' ? 'bg-gray-200' : ''}`}
+            to="/home"
+            className={`flex items-center gap-3 text-black font-regular hover:text-black px-4 py-2 rounded-[10px] ${location.pathname === '/home' ? 'bg-gray-200' : ''}`}
           >
             <img src="/icons/home-icon.svg" alt="Home" className="w-6 h-6" /> Home
           </Link>
           <Link
-            to="/spending"
-            className={`flex items-center gap-3 text-black font-regular hover:text-black px-4 py-2 rounded-[10px] ${location.pathname === '/spending' ? 'bg-gray-200' : ''}`}
+            to="/overview"
+            className={`flex items-center gap-3 text-black font-regular hover:text-black px-4 py-2 rounded-[10px] ${location.pathname === '/overview' ? 'bg-gray-200' : ''}`}
           >
             <img src="/icons/spending-icon.svg" alt="Overview" className="w-6 h-6" /> Overview
           </Link>
@@ -28,6 +28,12 @@ export default function Sidebar() {
             className={`flex items-center gap-3 text-black font-regular hover:text-black px-4 py-2 rounded-[10px] ${location.pathname === '/budget' ? 'bg-gray-200' : ''}`}
           >
             <img src="/icons/budget-icon.svg" alt="Budget" className="w-6 h-6" /> Budget
+          </Link>
+          <Link
+            to="/chat"
+            className={`flex items-center gap-3 text-black font-regular hover:text-black px-4 py-2 rounded-[10px] ${location.pathname === '/chat' ? 'bg-gray-200' : ''}`}
+          >
+            <img src="/icons/account-icon.svg" alt="Chat" className="w-6 h-6" /> Chat
           </Link>
         </nav>
       </div>
