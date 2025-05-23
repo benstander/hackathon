@@ -1,15 +1,25 @@
-require('dotenv').config()
+// Load environment variables from .env file
+require('dotenv').config();
 
-const express = require('express')
-const cors = require('cors')
-const financeRoutes = require('./routes/finance')
+// Import express and other middleware
+const express = require('express');
+const cors = require('cors');
 
-const app = express()
+// Import your router module (make sure this is exporting the router directly)
+const financeRoutes = require('./routes/finance');
 
-app.use(cors())
-app.use(express.json())
+// Initialize express app
+const app = express();
 
-app.use('/api/finance', financeRoutes)
+// Middleware setup
+app.use(cors());
+app.use(express.json());
 
-const Port = process.env.PORT || 3000;
-app.listen(PORT, () => console.log('hello'))
+// Mount finance routes under this path
+app.use('/api/finance', financeRoutes);
+
+// Start server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ Server running on http://localhost:${PORT}`);
+});
