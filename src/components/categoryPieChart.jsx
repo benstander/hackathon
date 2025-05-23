@@ -4,11 +4,11 @@ import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 const data = [
-  { name: 'Food', value: 400, color: '#1e40af' },      // Dark blue
-  { name: 'Transport', value: 300, color: '#2563eb' },  // Medium blue
-  { name: 'Entertainment', value: 300, color: '#3b82f6' }, // Bright blue
-  { name: 'Shopping', value: 200, color: '#60a5fa' },   // Light blue
-  { name: 'Bills', value: 100, color: '#93c5fd' },      // Very light blue
+  { name: 'Food', value: 400, color: '#000000' },      // Black
+  { name: 'Transport', value: 300, color: '#4B5563' },  // Dark grey
+  { name: 'Entertainment', value: 300, color: '#9CA3AF' }, // Medium grey
+  { name: 'Shopping', value: 200, color: '#D1D5DB' },   // Light grey
+  { name: 'Bills', value: 100, color: '#F3F4F6' },      // Very light grey
 ];
 
 const CustomTooltip = ({ active, payload }) => {

@@ -14,7 +14,7 @@ const chartData = [
 
 export function SpendingAreaGraph({ title, description, data = chartData, color = "#2563eb" }) {
   return (
-    <div className="w-full h-[420px] bg-white border border-gray-400 rounded-2xl p-4 flex flex-col">
+    <div className="w-full h-[420px] bg-white rounded-2xl p-4 flex flex-col">
       <div className="mb-2 text-sm">{title}</div>
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
@@ -32,6 +32,19 @@ export function SpendingAreaGraph({ title, description, data = chartData, color 
             tickLine={false}
             axisLine={false}
             tickMargin={8}
+            padding={{ left: 0, right: 0 }}
+            tick={({ x, y, payload, index, ...rest }) => (
+              <text
+                x={x}
+                y={y}
+                textAnchor={index === 0 ? 'start' : 'middle'}
+                fill="#000"
+                fontSize={12}
+                {...rest}
+              >
+                {payload.value}
+              </text>
+            )}
           />
           <Area
             type="monotone"
