@@ -25,21 +25,19 @@ export function SpendingAreaGraph({ title, description, data = generateSpreadOut
 
   return (
     <div className="w-full h-[420px] bg-white rounded-2xl p-4 flex flex-col">
-      {/* Title, total, and month, perfectly aligned with card padding */}
-      <div className="flex flex-col items-start">
-        <div className="mb-1 text-sm">{title}</div>
+      {/* Title and total amount - standardized for alignment */}
+      <div className="flex flex-col items-start mb-4 pt-4 pl-4">
+        <div className="mb-2 text-sm">Monthly Spending</div>
         <div className="text-2xl font-regular text-black">${totalSpent.toLocaleString()}</div>
-        <div className="mb-2 flex items-center gap-2 mt-2">
-        </div>
       </div>
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
           data={data}
           margin={{
-            top: 10,
-            right: 10,
-            left: 0,
-            bottom: 0,
+            top: 20,
+            right: 20,
+            left: 20,
+            bottom: 20,
           }}
         >
           <CartesianGrid vertical={false} strokeDasharray="3 3" />
