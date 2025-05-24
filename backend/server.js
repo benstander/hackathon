@@ -15,6 +15,7 @@ app.get("/", (req, res) => {
 
 // ✅ Mount API routes
 app.use("/api/prompts", require("./api/prompts"));
+app.use("/api/basiq", require ("./api/basiq"));
 app.use("/api/charts", require("./api/charts"));
 app.use("/api/transactions", require("./api/transactions/sync"));
 
