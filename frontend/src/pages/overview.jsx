@@ -6,27 +6,57 @@ import { Link } from 'react-router-dom';
 import { IncomeChart } from '../components/incomeChart';
 import { BudgetChart } from '../components/budgetChart';
 import { DonutPieChart } from '../components/donutPieChart';
+import { useFinancial } from '../context/FinancialContext';
 
 function Overview() {
-  const spendingData = [
-    { month: "Jan", amount: 186 },
-    { month: "Feb", amount: 305 },
-    { month: "Mar", amount: 237 },
-    { month: "Apr", amount: 73 },
-    { month: "May", amount: 209 },
-    { month: "Jun", amount: 214 },
-  ];
+  const { accounts, transactions, loading, error } = useFinancial();
 
-  const incomeData = [
-    { month: "Jan", amount: 250 },
-    { month: "Feb", amount: 280 },
-    { month: "Mar", amount: 300 },
-    { month: "Apr", amount: 320 },
-    { month: "May", amount: 350 },
-    { month: "Jun", amount: 380 },
-  ];
+  // Process transactions for spending data
+  const processSpendingData = () => {
+    if (!transactions) return [];
+    
+    const monthlyData = transactions.reduce((acc, transaction) => {
+      const date = new Date(transaction.date);
+      const month = date.toLocaleString('default', { month: 'short' });
+      const amount = Math.abs(transaction.amount);
+      
+      if (!acc[month]) {
+        acc[month] = 0;
+      }
+      acc[month] += amount;
+      return acc;
+    }, {});
 
+    return Object.entries(monthlyData).map(([month, amount]) => ({
+      month,
+      amount: Math.round(amount)
+    }));
+  };
 
+  // Process transactions for income data
+  const processIncomeData = () => {
+    if (!transactions) return [];
+    
+    const monthlyData = transactions.reduce((acc, transaction) => {
+      const date = new Date(transaction.date);
+      const month = date.toLocaleString('default', { month: 'short' });
+      const amount = transaction.amount > 0 ? transaction.amount : 0;
+      
+      if (!acc[month]) {
+        acc[month] = 0;
+      }
+      acc[month] += amount;
+      return acc;
+    }, {});
+
+    return Object.entries(monthlyData).map(([month, amount]) => ({
+      month,
+      amount: Math.round(amount)
+    }));
+  };
+
+  const spendingData = processSpendingData();
+  const incomeData = processIncomeData();
 
   function IncomeCard({ label, earned }) {
     return (
@@ -48,12 +78,34 @@ function Overview() {
     );
   }
 
+  if (loading) {
+    return (
+      <div className="flex min-h-screen bg-gray-50">
+        <Sidebar />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-lg">Loading financial data...</div>
+        </main>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen bg-gray-50">
+        <Sidebar />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-lg text-red-500">Error loading financial data: {error}</div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
       <main className="flex-1 flex flex-col min-h-screen">
         <div className="flex items-center justify-between h-20 px-12">
-          <div className="text-[22px] font-regular">Overview</div>
+          <div className="text-[22px] font-regular">Financial Overview</div>
           <div className="flex items-center gap-4">
             <button className="flex items-center gap-2 border px-8 py-3 rounded-full text-sm font-medium hover:bg-gray-100">
               + Account
@@ -77,6 +129,14 @@ function Overview() {
               <div className="grid grid-cols-2 gap-4 flex-1 min-h-[220px]">
                 <div className="bg-white border rounded-[20px] p-6 flex flex-col shadow">
                   <span className="mb-2 text-sm">LATEST TRANSACTIONS</span>
+                  {transactions?.slice(0, 5).map((transaction, index) => (
+                    <div key={index} className="flex justify-between items-center py-2 border-b">
+                      <span>{transaction.description}</span>
+                      <span className={transaction.amount > 0 ? 'text-green-500' : 'text-red-500'}>
+                        ${Math.abs(transaction.amount).toFixed(2)}
+                      </span>
+                    </div>
+                  ))}
                 </div>
                 <div className="bg-white border rounded-[20px] p-6 flex flex-col shadow">
                   <span className="mb-2 text-sm">UPCOMING TRANSACTIONS</span>

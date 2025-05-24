@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { ChatInterface } from '../components/ChatInterface';
 import { Link } from 'react-router-dom';
+import { api } from '../services/api';
+import { useFinancial } from '../context/FinancialContext';
 
 function useInitialMessage() {
   const location = useLocation();
@@ -20,6 +22,8 @@ export default function ChatPage() {
   const [chatInput, setChatInput] = useState('');
   const [messages, setMessages] = useState([]);
   const [chatHistory, setChatHistory] = useState(getSavedHistory());
+  const [isLoading, setIsLoading] = useState(false);
+  const { userData } = useFinancial();
 
   // Load chat history on mount and set up storage listener
   useEffect(() => {
@@ -37,56 +41,62 @@ export default function ChatPage() {
 
   // Handle initial message and chat history
   useEffect(() => {
-    if (initialMessage) {
+    if (initialMessage && messages.length === 0) {
       const newMessage = { text: initialMessage, isUser: true };
       setMessages([newMessage]);
       setChatInput('');
+      setIsLoading(true);
 
-      // Add AI response after a short delay
-      const timeout = setTimeout(() => {
-        setMessages(prev => [
-          ...prev,
-          {
-            text: "This is a simulated response from the AI. Replace this with actual ChatGPT integration.",
-            isUser: false
-          }
-        ]);
-      }, 1000);
+      // Call the AI API for the initial message
+      const fetchAIResponse = async () => {
+        try {
+          const response = await api.askAI(userData?.id, initialMessage);
+          setMessages(prev => [
+            ...prev,
+            { text: response.response, isUser: false }
+          ]);
+        } catch (error) {
+          setMessages(prev => [
+            ...prev,
+            { text: "Sorry, I encountered an error.", isUser: false }
+          ]);
+        } finally {
+          setIsLoading(false);
+        }
+      };
 
-      return () => clearTimeout(timeout);
+      fetchAIResponse();
     }
-  }, [initialMessage]);
+  }, [initialMessage, userData, messages.length]);
 
-  const handleChatSend = (e) => {
+  const handleChatSend = async (e) => {
     e.preventDefault();
     if (chatInput.trim() === '') return;
 
-    const userMessage = { text: chatInput.trim(), isUser: true };
-    
-    // If this is the first message in a new chat, treat as new chat thread
-    if (messages.length === 0) {
-      setChatHistory(prev => {
-        const filtered = prev.filter(chat => chat.firstMessage !== chatInput.trim());
-        const updated = [
-          { firstMessage: chatInput.trim(), timestamp: new Date().toISOString() },
-          ...filtered
-        ].slice(0, 5);
-        localStorage.setItem('chatHistory', JSON.stringify(updated));
-        return updated;
-      });
+    // Prevent duplicate initial message
+    if (
+      initialMessage &&
+      chatInput.trim() === initialMessage &&
+      messages.some(m => m.text === initialMessage && m.isUser)
+    ) {
+      setChatInput('');
+      return;
     }
 
-    // Add user message immediately
+    const userMessage = { text: chatInput.trim(), isUser: true };
+
     setMessages(prev => [...prev, userMessage]);
     setChatInput('');
+    setIsLoading(true);
 
-    // Simulate AI response after a short delay
-    setTimeout(() => {
-      setMessages(prev => [...prev, {
-        text: "This is a simulated response from the AI. Replace this with actual ChatGPT integration.",
-        isUser: false
-      }]);
-    }, 1000);
+    try {
+      const response = await api.askAI(userData?.id, chatInput.trim());
+      setMessages(prev => [...prev, { text: response.response, isUser: false }]);
+    } catch (error) {
+      setMessages(prev => [...prev, { text: "Sorry, I encountered an error.", isUser: false }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   console.log("Rendering ChatPage with messages:", messages);
@@ -116,7 +126,7 @@ export default function ChatPage() {
         </div>
         <div className="flex-1 bg-gray-50 flex flex-col justify-between">
           <div className="flex-1">
-            <ChatInterface messages={messages} />
+            <ChatInterface messages={messages} isLoading={isLoading} />
           </div>
           {/* Search Bar at Bottom */}
           <div className="w-full flex justify-center items-end pb-8 bg-grey-50">
