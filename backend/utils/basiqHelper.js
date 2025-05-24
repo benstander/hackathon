@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { response } = require('express');
 const qs = require('qs');
 
 async function getAccessToken() {
@@ -61,7 +62,7 @@ async function createUser(accessToken, email, mobileNumber, firstName, middleNam
 async function getClientToken(userId) {
   const payload = {
     scope: 'CLIENT_ACCESS',
-    userId: userId
+    userId: userId,
   };
 
   let config = {
@@ -83,12 +84,12 @@ async function getClientToken(userId) {
   }
 }
 
-async function retrieveUser(userId, clientToken) {
+async function retrieveUser(userId, accessToken) {
   let config = {
     method: 'get',
     url: `https://au-api.basiq.io/users/${userId}`,
     headers: { 
-      'Authorization': `Bearer ${clientToken}`,
+      'Authorization': `Bearer ${accessToken}`,
       'Accept': 'application/json'
     }
   };
@@ -109,13 +110,13 @@ async function retrieveUser(userId, clientToken) {
   }
 }
 
-async function listUserAccounts(clientToken, userId) {
+async function listUserAccounts(accessToken, userId) {
   // STEP 5: Fetch your aggregated data 
   let config = {
     method: 'get',
     url: `https://au-api.basiq.io/users/${userId}/accounts`,
     headers: { 
-      'Authorization': `Bearer ${clientToken}`, 
+      'Authorization': `Bearer ${accessToken}`, 
       'Accept': 'application/json'
     }
   };
@@ -128,7 +129,70 @@ async function listUserAccounts(clientToken, userId) {
   }
 }
 
-module.exports = { getAccessToken, createUser, getClientToken, retrieveUser, listUserAccounts }
+async function retrieveUserAccount(accessToken, userId, accountId) {
+  let config = {
+    method: 'get',
+    url: `https://au-api.basiq.io/users/${userId}/accounts/${accountId}`,
+    headers: { 
+      'Authorization': `Bearer ${accessToken}`, 
+      'Accept': 'application/json',
+    }
+  };
+
+  try {
+    const response = await axios(config)
+    return response.data
+  } catch(error) {
+    throw error
+  }
+}
+
+async function listUserTransactions(accessToken, userId) {
+  const config = {
+    method: 'get',
+    url: `https://au-api.basiq.io/users/${userId}/transactions`,
+    headers: { 
+      'Authorization': `Bearer ${accessToken}`, 
+      'Accept': 'application/json',
+    }
+  }
+
+  try {
+    const response = await axios(config)
+    return response.data
+  } catch(error) {
+    throw error
+  }
+}
+
+async function retrieveUserTransaction(accessToken, userId, transactionId) {
+  const config = {
+    method: 'get',
+    url: `https://au-api.basiq.io/users/${userId}/transactions/${transactionId}`,
+    headers: { 
+      'Authorization': `Bearer ${accessToken}`, 
+      'Accept': 'application/json',
+    }
+  } 
+
+  try {
+    const response = await axios(config)
+    return response.data
+  } catch(error) {
+    throw error
+  }  
+};
+
+module.exports = { 
+  getAccessToken, 
+  createUser, 
+  getClientToken, 
+  retrieveUser, 
+  listUserAccounts, 
+  retrieveUserAccount, 
+  listUserTransactions, 
+  retrieveUserTransaction 
+}
 
 async function main(email, mobileNumber) {
   try {
