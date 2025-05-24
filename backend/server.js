@@ -1,8 +1,9 @@
 require("dotenv").config();
 const express = require("express");
-const setupAppMiddleware = require("./connect");
+const setupAppMiddleware = require("./middleware");
 
 const app = express();
+app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
 // ✅ Centralized middleware setup
