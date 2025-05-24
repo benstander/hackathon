@@ -1,7 +1,11 @@
 const OpenAI = require("openai");
 
+// const openai = new OpenAI({
+//   apiKey: process.env.OPENAI_API_KEY
+// });
+
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: 'Api key placeholder'
 });
 
 function generatePrompt(transactions, goals) {

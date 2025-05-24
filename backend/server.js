@@ -7,7 +7,7 @@ const cors = require('cors');
 
 // Import your router module (make sure this is exporting the router directly)
 const financeRoutes = require('./routes/finance');
-const userRoutes = require('./routes/users')
+const basiqRoutes = require('./routes/basiq')
 
 // Initialize express app
 const app = express();
@@ -18,7 +18,7 @@ app.use(express.json());
 
 // Mount finance routes under this path
 app.use('/api/finance', financeRoutes);
-app.use('/api/users', userRoutes)
+app.use('/api/basiq', basiqRoutes)
 
 // Start server
 const PORT = process.env.PORT || 3000;
