@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3001/api'; // Adjust this to match your backend URL
+const API_BASE_URL = 'http://localhost:3000/api'; // Adjust this to match your backend URL
 
 export const api = {
   // User endpoints

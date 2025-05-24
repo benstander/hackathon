@@ -17,19 +17,29 @@ export function FinancialProvider({ children }) {
     const fetchData = async () => {
       try {
         setLoading(true);
+        console.log('Fetching user data for ID:', userId);
+        
         const [userData, accountsData, transactionsData] = await Promise.all([
           api.getUser(userId),
           api.getUserAccounts(userId),
           api.getUserTransactions(userId)
         ]);
 
+        console.log('Received user data:', userData);
+        
+        if (!userData) {
+          throw new Error('No user data received from the server');
+        }
+
         setUserData(userData);
         setAccounts(accountsData);
         setTransactions(transactionsData);
         setError(null);
       } catch (err) {
-        setError(err.message);
-        console.error('Error fetching financial data:', err);
+        const errorMessage = err.response?.data?.error || err.message;
+        console.error('Error fetching financial data:', errorMessage);
+        setError(errorMessage);
+        setUserData(null);
       } finally {
         setLoading(false);
       }

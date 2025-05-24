@@ -50,15 +50,19 @@ export default function ChatPage() {
       // Call the AI API for the initial message
       const fetchAIResponse = async () => {
         try {
-          const response = await api.askAI(userData?.id, initialMessage);
+          if (!userData?.id) {
+            throw new Error('User ID is not available');
+          }
+          const response = await api.askAI(userData.id, initialMessage);
           setMessages(prev => [
             ...prev,
             { text: response.response, isUser: false }
           ]);
         } catch (error) {
+          console.error('AI Response Error:', error);
           setMessages(prev => [
             ...prev,
-            { text: "Sorry, I encountered an error.", isUser: false }
+            { text: `Error: ${error.message || 'Sorry, I encountered an error.'}`, isUser: false }
           ]);
         } finally {
           setIsLoading(false);
@@ -90,10 +94,14 @@ export default function ChatPage() {
     setIsLoading(true);
 
     try {
-      const response = await api.askAI(userData?.id, chatInput.trim());
+      if (!userData?.id) {
+        throw new Error('User ID is not available');
+      }
+      const response = await api.askAI(userData.id, chatInput.trim());
       setMessages(prev => [...prev, { text: response.response, isUser: false }]);
     } catch (error) {
-      setMessages(prev => [...prev, { text: "Sorry, I encountered an error.", isUser: false }]);
+      console.error('AI Response Error:', error);
+      setMessages(prev => [...prev, { text: `Error: ${error.message || 'Sorry, I encountered an error.'}`, isUser: false }]);
     } finally {
       setIsLoading(false);
     }
