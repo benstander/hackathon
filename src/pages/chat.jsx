@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { ChatInterface } from '../components/ChatInterface';
+import { Link } from 'react-router-dom';
 
 function useInitialMessage() {
   const location = useLocation();
@@ -40,17 +41,6 @@ export default function ChatPage() {
       const newMessage = { text: initialMessage, isUser: true };
       setMessages([newMessage]);
       setChatInput('');
-      
-      // Update chat history
-      setChatHistory(prev => {
-        const filtered = prev.filter(chat => chat.firstMessage !== initialMessage);
-        const updated = [
-          { firstMessage: initialMessage, timestamp: new Date().toISOString() },
-          ...filtered
-        ].slice(0, 5);
-        localStorage.setItem('chatHistory', JSON.stringify(updated));
-        return updated;
-      });
 
       // Add AI response after a short delay
       const timeout = setTimeout(() => {
@@ -109,15 +99,30 @@ export default function ChatPage() {
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar chatHistory={chatHistory} />
       <main className="flex-1 flex flex-col min-h-screen">
-        <div className="flex-1 bg-white border-t border-gray-200 flex flex-col justify-between">
+        {/* Top Bar */}
+        <div className="flex items-center justify-between h-20 px-16">
+          <Link to="/home" className="text-[24px] font-medium">onTrack</Link>
+          <div className="flex items-center gap-2">
+            <button className="flex items-center gap-2 border px-8 py-3 rounded-full text-sm font-medium hover:bg-gray-100">
+              + Account
+            </button>
+            <a href="/settings" className="w-12 h-12 rounded-full border flex items-center justify-center bg-grey-50 mr-2">
+              <img src="/icons/settings-icon.svg" alt="Settings" className="w-6 h-6" />
+            </a>
+            <div className="w-12 h-12 rounded-full border flex items-center justify-center bg-grey-50">
+              <img src="/icons/account-icon.svg" alt="Account" className="w-6 h-6" />
+            </div>
+          </div>
+        </div>
+        <div className="flex-1 bg-gray-50 flex flex-col justify-between">
           <div className="flex-1">
             <ChatInterface messages={messages} />
           </div>
           {/* Search Bar at Bottom */}
-          <div className="w-full flex justify-center items-end pb-8 bg-white">
-            <form onSubmit={handleChatSend} className="relative bg-white border border-gray-300 rounded-2xl shadow-sm h-48 flex flex-col justify-between w-[720px] max-w-full mx-auto">
+          <div className="w-full flex justify-center items-end pb-8 bg-grey-50">
+            <form onSubmit={handleChatSend} className="relative bg-white border border-gray-300 rounded-2xl shadow-sm h-36 flex flex-col justify-between w-[720px] max-w-full mx-auto">
               <input
-                className="absolute top-8 left-8 bg-transparent outline-none border-none text-gray-400 text-[18px] w-2/3"
+                className="absolute top-6 left-8 bg-transparent outline-none border-none text-gray-600 text-[16px] w-2/3"
                 placeholder="Ask anything ...."
                 value={chatInput}
                 onChange={e => setChatInput(e.target.value)}
@@ -129,9 +134,9 @@ export default function ChatPage() {
                 <button 
                   type="submit"
                   aria-label="Send" 
-                  className="w-12 h-12 flex items-center justify-center rounded-xl bg-gray-200 hover:bg-gray-300 transition focus:outline-none"
+                  className="w-12 h-12 flex items-center justify-center rounded-xl border-gray-300 border bg-gray-100 hover:bg-gray-200 transition focus:outline-none"
                 >
-                  <img src="/icons/send-icon.svg" alt="Send" className="w-5 h-5" />
+                  <img src="/icons/send-icon.svg" alt="Send" className="w-5 h-5 text-white" />
                 </button>
               </div>
             </form>
