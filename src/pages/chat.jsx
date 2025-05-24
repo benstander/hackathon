@@ -1,29 +1,58 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { ChatInterface } from '../components/ChatInterface';
 
 function useInitialMessage() {
   const location = useLocation();
-  // Try to get initialMessage from location state (preferred)
   return location.state?.initialMessage || '';
+}
+
+function getSavedHistory() {
+  const saved = localStorage.getItem('chatHistory');
+  return saved ? JSON.parse(saved) : [];
 }
 
 export default function ChatPage() {
   const initialMessage = useInitialMessage();
+  const navigate = useNavigate();
   const [chatInput, setChatInput] = useState('');
-  const [messages, setMessages] = useState(
-    initialMessage ? [{ text: initialMessage, isUser: true }] : []
-  );
+  const [messages, setMessages] = useState([]);
+  const [chatHistory, setChatHistory] = useState(getSavedHistory());
 
-  // Simulate AI response for initial message if present
+  // Load chat history on mount and set up storage listener
   useEffect(() => {
-    if (
-      initialMessage &&
-      messages.length === 1 &&
-      messages[0].isUser &&
-      messages[0].text === initialMessage
-    ) {
+    // Initial load
+    setChatHistory(getSavedHistory());
+
+    // Listen for changes in localStorage
+    const handleStorageChange = () => {
+      setChatHistory(getSavedHistory());
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  // Handle initial message and chat history
+  useEffect(() => {
+    if (initialMessage) {
+      const newMessage = { text: initialMessage, isUser: true };
+      setMessages([newMessage]);
+      setChatInput('');
+      
+      // Update chat history
+      setChatHistory(prev => {
+        const filtered = prev.filter(chat => chat.firstMessage !== initialMessage);
+        const updated = [
+          { firstMessage: initialMessage, timestamp: new Date().toISOString() },
+          ...filtered
+        ].slice(0, 5);
+        localStorage.setItem('chatHistory', JSON.stringify(updated));
+        return updated;
+      });
+
+      // Add AI response after a short delay
       const timeout = setTimeout(() => {
         setMessages(prev => [
           ...prev,
@@ -33,17 +62,35 @@ export default function ChatPage() {
           }
         ]);
       }, 1000);
+
       return () => clearTimeout(timeout);
     }
-  }, [initialMessage, messages]);
+  }, [initialMessage]);
 
   const handleChatSend = (e) => {
     e.preventDefault();
     if (chatInput.trim() === '') return;
+
     const userMessage = { text: chatInput.trim(), isUser: true };
+    
+    // If this is the first message in a new chat, treat as new chat thread
+    if (messages.length === 0) {
+      setChatHistory(prev => {
+        const filtered = prev.filter(chat => chat.firstMessage !== chatInput.trim());
+        const updated = [
+          { firstMessage: chatInput.trim(), timestamp: new Date().toISOString() },
+          ...filtered
+        ].slice(0, 5);
+        localStorage.setItem('chatHistory', JSON.stringify(updated));
+        return updated;
+      });
+    }
+
+    // Add user message immediately
     setMessages(prev => [...prev, userMessage]);
     setChatInput('');
-    // Simulate AI response
+
+    // Simulate AI response after a short delay
     setTimeout(() => {
       setMessages(prev => [...prev, {
         text: "This is a simulated response from the AI. Replace this with actual ChatGPT integration.",
@@ -52,9 +99,15 @@ export default function ChatPage() {
     }, 1000);
   };
 
+  console.log("Rendering ChatPage with messages:", messages);
+
+  if (!Array.isArray(messages)) {
+    console.error("Messages is not an array:", messages);
+  }
+
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
+      <Sidebar chatHistory={chatHistory} />
       <main className="flex-1 flex flex-col min-h-screen">
         <div className="flex-1 bg-white border-t border-gray-200 flex flex-col justify-between">
           <div className="flex-1">

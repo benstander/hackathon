@@ -1,12 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { ChatInterface } from '../components/ChatInterface';
 
+function getSavedHistory() {
+  const saved = localStorage.getItem('chatHistory');
+  return saved ? JSON.parse(saved) : [];
+}
+
 function Home() {
   const [showChat, setShowChat] = useState(false);
   const [initialQuery, setInitialQuery] = useState('');
+  const [chatHistory, setChatHistory] = useState(getSavedHistory());
   const navigate = useNavigate();
+
+  // Load chat history on mount and set up storage listener
+  useEffect(() => {
+    // Initial load
+    setChatHistory(getSavedHistory());
+
+    // Listen for changes in localStorage
+    const handleStorageChange = () => {
+      setChatHistory(getSavedHistory());
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   const handleInitialSend = (e) => {
     e.preventDefault();
@@ -16,7 +36,7 @@ function Home() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
+      <Sidebar chatHistory={chatHistory} />
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-h-screen">
         {/* Top Bar */}
