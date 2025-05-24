@@ -1,0 +1,1 @@
+GET http://localhost:3000/api/basiq/user/fb919047-167b-4b33-9cfc-ab963c780166
