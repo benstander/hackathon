@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import Overview from './pages/overview';
-import Budget from './pages/Budget';
+import Budget from './pages/budget';
 import ChatPage from './pages/chat';
 import { FinancialProvider } from './context/FinancialContext';
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Sidebar from '../components/Sidebar';
+import Sidebar from '../components/sidebar';
 import { ChatInterface } from '../components/ChatInterface';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api';
@@ -47,9 +47,14 @@ export default function ChatPage() {
       setChatInput('');
       setIsLoading(true);
 
+      console.log("HELLO")
       // Call the AI API for the initial message
       const fetchAIResponse = async () => {
         try {
+          console.log("USER DATA", userData)
+          console.log("INITIAL MESSAGE", initialMessage)
+
+          
           const response = await api.askAI(userData?.id, initialMessage);
           setMessages(prev => [
             ...prev,
@@ -90,6 +95,8 @@ export default function ChatPage() {
     setIsLoading(true);
 
     try {
+      console.log(chatInput)
+      console.log(userData)
       const response = await api.askAI(userData?.id, chatInput.trim());
       setMessages(prev => [...prev, { text: response.response, isUser: false }]);
     } catch (error) {
