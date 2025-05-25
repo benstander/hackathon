@@ -46,7 +46,7 @@ export default function Sidebar({ chatHistory = [], collapsed, setCollapsed }) {
 
   if (collapsed) {
     return (
-      <div className="fixed top-0 left-0 z-50 flex items-center h-20 px-8 bg-gray-50 gap-4">
+      <div className="fixed top-0 left-0 z-50 flex items-center h-20 px-8 bg-white gap-4">
         <button onClick={() => setCollapsed(false)} className="p-1 rounded-full hover:bg-gray-100 transition">
           <img src="/icons/sidebar-icon.svg" alt="App Icon" className="w-6 h-6" />
         </button>
@@ -59,9 +59,9 @@ export default function Sidebar({ chatHistory = [], collapsed, setCollapsed }) {
   }
 
   return (
-    <aside className="fixed top-0 left-0 w-[260px] flex flex-col h-screen border-r border-gray-200 bg-gray-50 py-0 pr-4 gap-10">
+    <aside className="fixed top-0 left-0 w-[260px] flex flex-col h-screen border-r border-gray-200 bg-white py-0 pr-4 gap-10">
       {/* Top: App Icon and New Chat Icon */}
-      <div className="flex items-center justify-between h-20 px-8">
+      <div className="flex items-center justify-between h-20 px-8 bg-white">
         <button onClick={() => setCollapsed(true)} className="p-1 rounded-full hover:bg-gray-100 transition">
           <img src="/icons/sidebar-icon.svg" alt="App Icon" className="w-6 h-6" />
         </button>
@@ -70,7 +70,7 @@ export default function Sidebar({ chatHistory = [], collapsed, setCollapsed }) {
         </Link>
       </div>
       {/* Previous Chats Only */}
-      <div className="flex-1 overflow-y-auto pl-6">
+      <div className="flex-1 overflow-y-auto pl-6 bg-white">
         {groupOrder.map(
           group =>
             grouped[group] && grouped[group].length > 0 && (

@@ -52,9 +52,6 @@ export default function ChatPage() {
       // Call the AI API for the initial message
       const fetchAIResponse = async () => {
         try {
-          if (!userData?.id) {
-            throw new Error('User ID is not available');
-          }
           console.log("USER DATA", userData)
           console.log("INITIAL MESSAGE", initialMessage)
 
@@ -100,9 +97,6 @@ export default function ChatPage() {
     setIsLoading(true);
 
     try {
-      if (!userData?.id) {
-        throw new Error('User ID is not available');
-      }
       console.log(chatInput)
       console.log(userData)
       const response = await api.askAI(userData?.id, chatInput.trim());
@@ -122,7 +116,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-white">
       <Sidebar chatHistory={chatHistory} collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
       <main className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${sidebarCollapsed ? 'ml-0' : 'ml-[260px]'}`}>
         
@@ -131,7 +125,7 @@ export default function ChatPage() {
           <Link to="/home" className="text-[24px] font-medium">onTrack</Link>
           <div className="flex items-center gap-2">
             <Link to="/offers" className="flex items-center gap-2 border px-8 py-3 rounded-full text-sm font-medium hover:bg-gray-100">
-              Your offers
+              Your Offers
             </Link>
             <a href="/settings" className="w-12 h-12 rounded-full border flex items-center justify-center bg-grey-50 mr-2">
               <img src="/icons/settings-icon.svg" alt="Settings" className="w-6 h-6" />
@@ -141,7 +135,7 @@ export default function ChatPage() {
             </div>
           </div>
         </div>
-        <div className="flex-1 bg-gray-50 flex flex-col justify-between">
+        <div className="flex-1 bg-white flex flex-col justify-between">
           <div className="flex-1 w-full">
             <ChatInterface messages={messages} isLoading={isLoading} />
           </div>
