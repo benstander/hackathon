@@ -163,7 +163,7 @@ function Home() {
               <div className="w-full max-w-[1200px] mx-auto mt-20 mb-16">
                 <div className="w-[870px] mx-auto flex justify-between items-center mb-6">
                   <h2 className="text-[22px] font-medium ml-4">Popular Offers</h2>
-                  <Link to="/offers" className="text-black font-medium rounded-[10px] border-gray-300 border bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-[10px] transition mr-2">Show All</Link>
+                  <Link to="/offers" className="text-black font-medium rounded-[10px] border-gray-300 border bg-white shadow-sm hover:bg-gray-200 px-4 py-2 rounded-[10px] transition mr-2">Show All</Link>
                 </div>
                 <div className="relative">
                   <div className={`overflow-hidden pb-4 transition-all duration-300 ${showAllOffers ? '' : 'w-[872px]'}`}> {/* 4*200px + 3*16px gap */}
