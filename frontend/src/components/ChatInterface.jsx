@@ -19,7 +19,7 @@ export function ChatInterface({ messages, isLoading }) {
               className={`max-w-[70%] rounded-full px-8 py-4 ${
                 message.isUser
                   ? 'bg-black text-gray-50'
-                  : 'bg-gray-100 text-gray-800'
+                  : ''
               }`}
             >
               {message.text}
