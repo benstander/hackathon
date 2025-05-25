@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Sidebar from '../components/sidebar';
 import { useFinancial } from '../context/FinancialContext';
-import { useState } from 'react';
+
+function getSavedHistory() {
+  const saved = localStorage.getItem('chatHistory');
+  return saved ? JSON.parse(saved) : [];
+}
 
 const offersByCategory = {
   Insurance: [
@@ -45,14 +49,22 @@ const offersByCategory = {
     { type: 'UBank', details: '4.5% interest on savings' },
     { type: 'Bendigo Bank', details: '$50 cashback + 5.99% home loan' },
   ],
-  
 };
 
 export default function Offers() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [chatHistory, setChatHistory] = useState(getSavedHistory());
+
+  useEffect(() => {
+    setChatHistory(getSavedHistory());
+    const handleStorageChange = () => setChatHistory(getSavedHistory());
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   return (
     <div className="flex min-h-screen bg-gray-50 font-sans">
-      <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
+      <Sidebar chatHistory={chatHistory} collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
       <main className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${sidebarCollapsed ? 'ml-0' : 'ml-[260px]'}`}>
         {/* Top Bar */}
         <div className="flex items-center justify-between h-20 px-16">
@@ -73,17 +85,17 @@ export default function Offers() {
         {/* Offers Content */}
         <div className="flex-1 bg-gray-50 py-12 px-4 ml-12">
           <div className="max-w-[1200px] mx-auto">
-            <h1 className="text-[24px] font-bold mb-10">All Offers</h1>
+            <h1 className="text-[24px] font-bold mb-10 italic">All Offers</h1>
             {Object.entries(offersByCategory).map(([category, offers]) => (
-              <div key={category} className="mb-12">
-                <h2 className="text-[20px] font-regular mb-4">{category}</h2>
+              <div key={category} className="mb-10">
+                <h2 className="text-[18px] font-medium mb-4">{category}</h2>
                 <div className="relative w-full">
-                  <div className="overflow-x-auto pb-4 scrollbar-hide">
-                    <div className="flex gap-4 min-w-max">
+                  <div className="overflow-x-auto pb-4 scrollbar-hide w-full">
+                    <div className="flex gap-4 min-w-fit">
                       {offers.map((offer, idx) => (
                         <div
                           key={offer.type + idx}
-                          className="w-[200px] h-[140px] rounded-[10px] flex flex-col items-start justify-between px-8 pt-6 pb-6 bg-white border border-gray-200 hover:shadow-lg transition cursor-pointer flex-shrink-0"
+                          className="w-[200px] h-[140px] rounded-[10px] flex flex-col items-start justify-between px-8 pt-6 pb-6 bg-white border border-gray-300 shadow-sm transition cursor-pointer flex-shrink-0"
                         >
                           <div className="font-bold text-base">{offer.type}</div>
                           <div className="font-normal text-[12px] mt-2">{offer.details}</div>
