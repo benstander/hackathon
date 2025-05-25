@@ -36,17 +36,22 @@ router.post("/", async (req, res) => {
         || transactionData.class === 'direct-credit' 
         || transactionData.class === 'cash-withdrawal'
       ) {
+        // THIS WONT WORK BECAUSE transaction data iwth direct-credit class weren't fetched because of api limit (MAX 500 transaction objects)
         if (transactionData.class === 'direct-credit') {
           income += Number(transactionData.amount)
         }
+        // transaction.description =transactionData.description
         transaction.category = transactionData.class
         transaction.amount = Number(transactionData.amount)
+        // transaction.date = transactionData.postDate
         transactions.push(transaction)
       }
 
       else {
+        // transaction.description =transactionData.description
         transaction.category = transactionData.subClass.title
         transaction.amount = Number(transactionData.amount)
+        // transaction.date = transactionData.postDate
         transactions.push(transaction)
       }
     }
