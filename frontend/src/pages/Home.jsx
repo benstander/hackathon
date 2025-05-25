@@ -89,7 +89,7 @@ function Home() {
         <div className="flex items-center justify-between h-20 px-16">
           <div className="text-[24px] font-medium">onTrack</div>
           <div className="flex items-center gap-2">
-            <Link to="/offers" className="flex items-center gap-2 border px-8 py-3 rounded-full text-sm font-medium hover:bg-gray-100 shadow-sm border border-gray-300 border border-gray-300">
+            <Link to="/offers" className="flex items-center gap-2 border px-8 py-3 rounded-full text-black text-sm font-medium hover:bg-gray-100 shadow-sm border border-gray-300 border border-gray-300">
               Your Offers
             </Link>
             <Link to="/settings" className="w-12 h-12 rounded-full border flex items-center justify-center bg-grey-50 shadow-sm border border-gray-300 mr-2 hover:bg-gray-100">
@@ -107,7 +107,7 @@ function Home() {
             <div className="mt-8 mb-8">
               <h2 className="text-[32px] italic font-bold text-center mb-8 text-black ">What do you want to know?</h2>
               <div className="w-[720px] max-w-full mx-auto">
-                <form onSubmit={handleInitialSend} className="relative bg-white border border-gray-300 rounded-[10px] shadow-sm h-48 flex flex-col justify-between">
+                <form onSubmit={handleInitialSend} className="relative bg-white border border-gray-300 rounded-[10px] shadow-md h-48 flex flex-col justify-between">
                   <input
                     className="absolute top-8 left-8 bg-transparent outline-none border-none text-gray-600 text-[16px] w-2/3"
                     placeholder="Ask anything ...."
@@ -150,7 +150,7 @@ function Home() {
                   <button
                     key={p.type + p.prompt}
                     type="button"
-                    className="w-[200px] h-[140px] rounded-[10px] flex flex-col items-start justify-between px-8 pt-6 pb-6 bg-white border border-gray-300 shadow-sm transition text-left relative text-black"
+                    className="w-[200px] h-[140px] rounded-[10px] flex flex-col items-start justify-between px-8 pt-6 pb-6 bg-white border border-gray-300 shadow-md transition text-left relative text-black"
                     onClick={() => navigate('/chat', { state: { initialMessage: p.prompt } })}
                   >
                     <div className="font-bold text-base">{p.type}</div>
@@ -163,7 +163,7 @@ function Home() {
               <div className="w-full max-w-[1200px] mx-auto mt-20 mb-16">
                 <div className="w-[870px] mx-auto flex justify-between items-center mb-6">
                   <h2 className="text-[22px] font-medium ml-4">Popular Offers</h2>
-                  <Link to="/offers" className="text-black font-medium rounded-[10px] border-gray-300 border bg-white shadow-sm hover:bg-gray-200 px-4 py-2 rounded-[10px] transition mr-2">Show All</Link>
+                  <Link to="/offers" className="text-black font-medium hover:bg-gray-200 px-4 py-2 rounded-[10px] transition mr-2">Show All</Link>
                 </div>
                 <div className="relative">
                   <div className={`overflow-hidden pb-4 transition-all duration-300 ${showAllOffers ? '' : 'w-[872px]'}`}> {/* 4*200px + 3*16px gap */}
@@ -171,7 +171,7 @@ function Home() {
                       {(showAllOffers ? offers : offers.slice(0, 4)).map(offer => (
                         <div
                           key={offer.type}
-                          className="w-[200px] h-[140px] rounded-[10px] flex flex-col items-start justify-between px-8 pt-6 pb-6 bg-white border border-gray-300 shadow-sm transition cursor-pointer"
+                          className="w-[200px] h-[140px] rounded-[10px] flex flex-col items-start justify-between px-8 pt-6 pb-6 bg-white border border-gray-300 shadow-md transition cursor-pointer"
                         >
                           <div className="font-bold text-base">{offer.type}</div>
                           <div className="font-normal text-[12px] mt-2">{offer.details}</div>
