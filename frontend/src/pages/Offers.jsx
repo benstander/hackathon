@@ -82,7 +82,7 @@ export default function Offers() {
   }, [expandedOffer]);
 
   return (
-    <div className="flex min-h-screen bg-gray-50 font-sans">
+    <div className="flex min-h-screen bg-white font-sans">
       <Sidebar chatHistory={chatHistory} collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
       <main className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${sidebarCollapsed ? 'ml-0' : 'ml-[260px]'}`}>
         {/* Top Bar */}
@@ -102,9 +102,9 @@ export default function Offers() {
         </div>
         
         {/* Offers Content */}
-        <div className="flex-1 bg-gray-50 py-12 px-4 ml-12">
+        <div className="flex-1 bg-white py-12 px-4 ml-12">
           <div className="max-w-[1200px] mx-auto">
-            <h1 className="text-[24px] font-bold mb-10 italic">All Offers</h1>
+            <h1 className="text-[24px] font-bold mb-10 italic">Your Offers</h1>
             {Object.entries(offersByCategory).map(([category, offers]) => (
               <div key={category} className="mb-10">
                 <h2 className="text-[18px] font-medium mb-4">{category}</h2>
