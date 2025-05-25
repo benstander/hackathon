@@ -70,7 +70,7 @@ function Home() {
         <div className="flex items-center justify-between h-20 px-16">
           <div className="text-[24px] font-medium">onTrack</div>
           <div className="flex items-center gap-2">
-            <Link className="flex items-center gap-2 border px-8 py-3 rounded-full text-sm font-medium hover:bg-gray-100">
+            <Link to="/offers" className="flex items-center gap-2 border px-8 py-3 rounded-full text-sm font-medium hover:bg-gray-100">
               Your Offers
             </Link>
             <Link to="/settings" className="w-12 h-12 rounded-full border flex items-center justify-center bg-grey-50 mr-2">

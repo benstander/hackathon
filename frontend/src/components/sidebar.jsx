@@ -53,7 +53,7 @@ export default function Sidebar({ chatHistory = [], collapsed, setCollapsed }) {
         <Link to="/home" className="p-1 rounded-full hover:bg-gray-100 transition" aria-label="New Chat">
           <img src="/icons/newChat.svg" alt="New Chat" className="w-7 h-7" />
         </Link>
-        <span className="text-[24px] font-medium ml-4">onTrack</span>
+        <Link to="/home" className="text-[24px] font-medium ml-4">onTrack</Link>
       </div>
     );
   }
