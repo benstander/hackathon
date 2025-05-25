@@ -109,7 +109,7 @@ function Home() {
               <div className="w-[720px] max-w-full mx-auto">
                 <form onSubmit={handleInitialSend} className="relative bg-white border border-gray-300 rounded-[20px] shadow-md h-48 flex flex-col justify-between">
                   <input
-                    className="absolute top-8 left-8 bg-transparent outline-none border-none text-gray-600 text-[22px] w-2/3"
+                    className="absolute top-8 left-8 bg-transparent outline-none border-none text-gray-600 text-[16px] w-2/3"
                     placeholder="Ask anything ...."
                     value={initialQuery}
                     onChange={e => setInitialQuery(e.target.value)}
