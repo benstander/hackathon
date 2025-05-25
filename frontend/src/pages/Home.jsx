@@ -149,7 +149,7 @@ function Home() {
               </div>
 
               {/* Offers section */}
-              <div className="w-full max-w-[1200px] mx-auto mt-20">
+              <div className="w-full max-w-[1200px] mx-auto mt-20 mb-16">
                 <div className="w-[870px] mx-auto flex justify-between items-center mb-6">
                   <h2 className="text-[22px] font-medium ml-4">Popular Offers</h2>
                   <Link to="/offers" className="text-black font-medium rounded-[10px] border-gray-300 border bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-[10px] transition mr-2">Show All</Link>

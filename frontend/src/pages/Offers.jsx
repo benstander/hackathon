@@ -45,6 +45,7 @@ const offersByCategory = {
     { type: 'UBank', details: '4.5% interest on savings' },
     { type: 'Bendigo Bank', details: '$50 cashback + 5.99% home loan' },
   ],
+  
 };
 
 export default function Offers() {
@@ -56,7 +57,7 @@ export default function Offers() {
         {/* Top Bar */}
         <div className="flex items-center justify-between h-20 px-16">
           <Link to="/home" className="text-[24px] font-medium">onTrack</Link>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 px-16 max-w-[1200px]">
             <Link to="/offers" className="flex items-center gap-2 border px-8 py-3 rounded-full text-sm font-medium hover:bg-gray-100">
               Your Offers
             </Link>
