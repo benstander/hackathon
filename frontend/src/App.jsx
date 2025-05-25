@@ -3,6 +3,7 @@ import Home from './pages/Home';
 import Overview from './pages/overview';
 import Budget from './pages/Budget';
 import ChatPage from './pages/chat';
+import Offers from './pages/Offers';
 import { FinancialProvider } from './context/FinancialContext';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
           <Route path="/overview" element={<Overview />} />
           <Route path="/budget" element={<Budget />} />
           <Route path="/chat" element={<ChatPage />} />
+          <Route path="/offers" element={<Offers />} />
         </Routes>
       </Router>
     </FinancialProvider>

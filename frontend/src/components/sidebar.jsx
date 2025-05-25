@@ -38,17 +38,13 @@ function groupChatsByDate(chatHistory) {
   return groups;
 }
 
-export default function Sidebar({ chatHistory = [] }) {
+export default function Sidebar({ chatHistory = [], collapsed, setCollapsed }) {
   const location = useLocation();
   const grouped = groupChatsByDate(chatHistory);
   const groupOrder = ['Today', 'Yesterday', 'Previous 7 Days', 'Older'];
   const activeInitialMessage = location.pathname === '/chat' && location.state?.initialMessage;
 
-  // Collapsible sidebar state
-  const [collapsed, setCollapsed] = useState(false);
-
   if (collapsed) {
-    // Floating bar with sidebar icon, new chat icon, and Hello, Ben text
     return (
       <div className="fixed top-0 left-0 z-50 flex items-center h-20 px-8 bg-gray-50 gap-4">
         <button onClick={() => setCollapsed(false)} className="p-1 rounded-full hover:bg-gray-100 transition">
@@ -63,7 +59,7 @@ export default function Sidebar({ chatHistory = [] }) {
   }
 
   return (
-    <aside className="w-[260px] flex flex-col h-screen border-r border-gray-200 bg-gray-50 py-0 pr-4 gap-10">
+    <aside className="fixed top-0 left-0 w-[260px] flex flex-col h-screen border-r border-gray-200 bg-gray-50 py-0 pr-4 gap-10">
       {/* Top: App Icon and New Chat Icon */}
       <div className="flex items-center justify-between h-20 px-8">
         <button onClick={() => setCollapsed(true)} className="p-1 rounded-full hover:bg-gray-100 transition">
