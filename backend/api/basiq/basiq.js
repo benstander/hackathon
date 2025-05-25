@@ -111,7 +111,7 @@ basiqRouter.get('/user/:basiqUserId/accounts/:accountId', async (req, res) => {
   }
 })
 
-// List all transactions 
+// List all transactions (500 transactions MAX)
 basiqRouter.get('/user/:basiqUserId/transactions', async (req, res) => {
   const basiqUserId = req.params.basiqUserId
 
