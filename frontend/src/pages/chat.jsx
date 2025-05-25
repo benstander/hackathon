@@ -52,9 +52,9 @@ export default function ChatPage() {
       // Call the AI API for the initial message
       const fetchAIResponse = async () => {
         try {
-          if (!userData?.id) {
-            throw new Error('User ID is not available');
-          }
+          // if (!userData?.id) {
+          //   throw new Error('User ID is not available');
+          // }
           console.log("USER DATA", userData)
           console.log("INITIAL MESSAGE", initialMessage)
 
@@ -100,9 +100,9 @@ export default function ChatPage() {
     setIsLoading(true);
 
     try {
-      if (!userData?.id) {
-        throw new Error('User ID is not available');
-      }
+      // if (!userData?.id) {
+      //   throw new Error('User ID is not available');
+      // }
       console.log(chatInput)
       console.log(userData)
       const response = await api.askAI(userData?.id, chatInput.trim());

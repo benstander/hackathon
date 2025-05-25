@@ -5,20 +5,56 @@ const { getUserById } = require("../../db/queries/users");
 const { getTransactionsByUserId } = require("../../db/queries/transactions");
 const buildFinancePrompt = require("../../logic/buildFinancePrompt");
 
+const {
+  getAccessToken, 
+  createUser, 
+  getClientToken, 
+  retrieveUser, 
+  listUserAccounts, 
+  retrieveUserAccount, 
+  listUserTransactions, 
+  retrieveUserTransaction
+} = require('../../Utils/basiqHelper')
+
 router.post("/", async (req, res) => {
-  console.log("🔥 /api/prompts/ask endpoint HIT");
-
   try {
-    const { user_id, question } = req.body;
-    console.log("🧾 Incoming body:", req.body);
+    const { userId, question } = req.body;
 
-    const user = await getUserById(user_id);
-    const transactions = await getTransactionsByUserId(user_id);
+    const accessToken = await getAccessToken()
+    const transactionObject = await listUserTransactions(accessToken, userId)
+    const transactionsData = transactionObject.data
 
-    const prompt = buildFinancePrompt({ user, transactions, question });
+    console.log(transactionsData)
 
-    console.log("🧠 Prompt input:");
-    console.log(JSON.stringify({ user, transactions, question, prompt }, null, 2));
+    const income = 0;
+    const transactions = []
+
+    for (const transactionData of transactionsData) {
+      const transaction = {}
+
+      // NO SUBCLASS
+      if (transactionData.class === 'transfer' || transactionData.class === 'bank-fee' || transactionData.class === 'direct-credit') {
+        if (transactionData.class === 'direct-credit') {
+          income += Number(transactionData.amount)
+        }
+        transaction.category = transactionData.class
+        transaction.amount = Number(transactionData.amount)
+        transactions.push(transaction)
+      }
+
+      else {
+        transaction.category = transactionData.class.titile
+        transaction.amount = Number(transactionData.amount)
+        transactions.push(transaction)
+      }
+    }
+
+    const user = {
+      income: income,
+      savingsGoal: 10000
+    }
+
+    const prompt = buildFinancePrompt(user, transactions, question);
 
     const messages = [
       { role: "system", content: "You are a helpful finance assistant." },
@@ -28,7 +64,7 @@ router.post("/", async (req, res) => {
     const reply = await callGroqLLM(messages);
     res.json({ response: reply });
   } catch (err) {
-    console.error("❌ Prompt error:", err);
+    console.error("Prompt error:", err);
     res.status(500).json({ error: "Something went wrong." });
   }
 });

@@ -35,7 +35,6 @@ export const api = {
 
   // AI Chat endpoint
   askAI: async (userId, question) => {
-    console.log("HELLO")
     const response = await axios.post(`${API_BASE_URL}/prompts/ask`, {
       userId: userId,
       question
