@@ -21,10 +21,10 @@ router.post("/", async (req, res) => {
     const { userId, question } = req.body;
 
     const accessToken = await getAccessToken()
-    const transactionObject = await listUserTransactions(accessToken, userId)
+    const transactionObject = await listUserTransactions(accessToken, userId) // WILL ONLY RETRIEVE 5 OBJECTS MAX
     const transactionsData = transactionObject.data
 
-    const income = 0;
+    const income = 50000; // HARDCODED CAUSE WE CAN'T RETRIEVE INCOME DATA
     const transactions = []
 
     for (const transactionData of transactionsData) {
