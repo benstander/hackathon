@@ -15,6 +15,8 @@ function buildFinancePrompt(user, transactions, question ) {
   }
 
   summary += `\nQuestion: ${question}`;
+  console.log("SUMMARY", summary)
+
   return summary;
 }
 

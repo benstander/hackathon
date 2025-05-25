@@ -24,16 +24,18 @@ router.post("/", async (req, res) => {
     const transactionObject = await listUserTransactions(accessToken, userId)
     const transactionsData = transactionObject.data
 
-    console.log(transactionsData)
-
     const income = 0;
     const transactions = []
 
     for (const transactionData of transactionsData) {
       const transaction = {}
-
-      // NO SUBCLASS
-      if (transactionData.class === 'transfer' || transactionData.class === 'bank-fee' || transactionData.class === 'direct-credit') {
+  
+      // These classes have NO SUBCLASS OR UNKNOWN SUBCLASS
+      if (transactionData.class === 'transfer' 
+        || transactionData.class === 'bank-fee' 
+        || transactionData.class === 'direct-credit' 
+        || transactionData.class === 'cash-withdrawal'
+      ) {
         if (transactionData.class === 'direct-credit') {
           income += Number(transactionData.amount)
         }
@@ -43,7 +45,7 @@ router.post("/", async (req, res) => {
       }
 
       else {
-        transaction.category = transactionData.class.titile
+        transaction.category = transactionData.subClass.title
         transaction.amount = Number(transactionData.amount)
         transactions.push(transaction)
       }
