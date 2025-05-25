@@ -16,9 +16,9 @@ export function ChatInterface({ messages, isLoading }) {
             className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[70%] rounded-full px-6 py-3 ${
+              className={`max-w-[70%] rounded-full px-8 py-4 ${
                 message.isUser
-                  ? 'bg-gray-200 text-gray-800'
+                  ? 'bg-black text-gray-50'
                   : 'bg-gray-100 text-gray-800'
               }`}
             >
@@ -28,7 +28,7 @@ export function ChatInterface({ messages, isLoading }) {
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-gray-100 text-gray-800 rounded-full px-6 py-3">
+            <div className="bg-gray-100 text-gray-800 rounded-full px-8 py-4">
               Thinking...
             </div>
           </div>
