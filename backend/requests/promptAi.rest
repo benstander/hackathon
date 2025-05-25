@@ -1,0 +1,7 @@
+POST http://localhost:3000/api/prompts/ask 
+Content-Type: application/json
+
+{
+  "userId": "fb919047-167b-4b33-9cfc-ab963c780166",
+  "question": "What do i spend the most money on?"
+}

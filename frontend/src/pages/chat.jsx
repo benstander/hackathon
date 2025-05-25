@@ -48,13 +48,18 @@ export default function ChatPage() {
       setChatInput('');
       setIsLoading(true);
 
+      console.log("HELLO")
       // Call the AI API for the initial message
       const fetchAIResponse = async () => {
         try {
           if (!userData?.id) {
             throw new Error('User ID is not available');
           }
-          const response = await api.askAI(userData.id, initialMessage);
+          console.log("USER DATA", userData)
+          console.log("INITIAL MESSAGE", initialMessage)
+
+          
+          const response = await api.askAI(userData?.id, initialMessage);
           setMessages(prev => [
             ...prev,
             { text: response.response, isUser: false }
@@ -98,7 +103,9 @@ export default function ChatPage() {
       if (!userData?.id) {
         throw new Error('User ID is not available');
       }
-      const response = await api.askAI(userData.id, chatInput.trim());
+      console.log(chatInput)
+      console.log(userData)
+      const response = await api.askAI(userData?.id, chatInput.trim());
       setMessages(prev => [...prev, { text: response.response, isUser: false }]);
     } catch (error) {
       console.error('AI Response Error:', error);
