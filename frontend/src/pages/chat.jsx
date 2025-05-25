@@ -118,6 +118,7 @@ export default function ChatPage() {
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar chatHistory={chatHistory} collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
       <main className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${sidebarCollapsed ? 'ml-0' : 'ml-[260px]'}`}>
+        
         {/* Top Bar */}
         <div className="flex items-center justify-between h-20 px-16">
           <Link to="/home" className="text-[24px] font-medium">onTrack</Link>
@@ -137,6 +138,7 @@ export default function ChatPage() {
           <div className="flex-1 w-full">
             <ChatInterface messages={messages} isLoading={isLoading} />
           </div>
+
           {/* Search Bar at Bottom */}
           <div className="w-full flex justify-center items-end pb-8 bg-grey-50">
             <form onSubmit={handleChatSend} className="relative bg-white border border-gray-300 rounded-2xl shadow-sm h-36 flex flex-col justify-between w-[720px] max-w-full mx-auto">
