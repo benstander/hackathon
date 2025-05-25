@@ -51,9 +51,19 @@ const offersByCategory = {
   ],
 };
 
+// Helper to extract potential savings from details
+function getPotentialSavings(details) {
+  const match = details.match(/\$([0-9,]+)/);
+  if (match) return `$${match[1]}`;
+  const percentMatch = details.match(/([0-9]{1,2})%/);
+  if (percentMatch) return `${percentMatch[1]}%`;
+  return 'Varies';
+}
+
 export default function Offers() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [chatHistory, setChatHistory] = useState(getSavedHistory());
+  const [expandedOffer, setExpandedOffer] = useState(null);
 
   useEffect(() => {
     setChatHistory(getSavedHistory());
@@ -61,6 +71,15 @@ export default function Offers() {
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
+
+  useEffect(() => {
+    if (expandedOffer) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [expandedOffer]);
 
   return (
     <div className="flex min-h-screen bg-gray-50 font-sans">
@@ -96,6 +115,7 @@ export default function Offers() {
                         <div
                           key={offer.type + idx}
                           className="w-[200px] h-[140px] rounded-[10px] flex flex-col items-start justify-between px-8 pt-6 pb-6 bg-white border border-gray-300 shadow-sm transition cursor-pointer flex-shrink-0"
+                          onClick={() => setExpandedOffer({ ...offer, category })}
                         >
                           <div className="font-bold text-base">{offer.type}</div>
                           <div className="font-normal text-[12px] mt-2">{offer.details}</div>
@@ -106,6 +126,27 @@ export default function Offers() {
                 </div>
               </div>
             ))}
+            {expandedOffer && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                <div className="bg-white rounded-2xl shadow-2xl p-10 max-w-[400px] w-full relative animate-fade-in flex flex-col items-center" style={{ minHeight: '380px' }}>
+                  <div className="flex items-center w-full mb-6">
+                    <div className="text-[22px] font-bold text-left flex-1">{expandedOffer.type}</div>
+                    <button
+                      className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition text-2xl font-bold text-gray-500"
+                      onClick={() => setExpandedOffer(null)}
+                      aria-label="Close"
+                    >
+                      ×
+                    </button>
+                  </div>
+                  <div className="mt-8">
+                    <div className="text-[16px] font-medium mb-2 text-center text-gray-500">{expandedOffer.category}</div>
+                    <div className="text-[15px] text-gray-700 text-center mt-4 mb-4">{expandedOffer.details}</div>
+                  </div>
+                  <button className="mt-auto bg-black text-white rounded-[10px] px-8 py-3 text-base font-semibold shadow hover:bg-gray-800 transition">Explore</button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </main>
