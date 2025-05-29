@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000/api'; // Adjust this to match your backend URL
+const API_BASE_URL = '/api'; // Updated to use relative path for Next.js API routes
 
 export const api = {
   // Returns user 

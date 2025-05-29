@@ -1,11 +1,23 @@
-import React, { useEffect, useRef } from 'react';
+'use client'
 
-export function ChatInterface({ messages, isLoading }) {
-  const messagesEndRef = useRef(null);
+import React, { useEffect, useRef } from 'react'
+
+interface Message {
+  text: string
+  isUser: boolean
+}
+
+interface ChatInterfaceProps {
+  messages: Message[]
+  isLoading: boolean
+}
+
+export function ChatInterface({ messages, isLoading }: ChatInterfaceProps) {
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isLoading]);
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages, isLoading])
 
   return (
     <div className="flex flex-col h-full">
@@ -16,7 +28,7 @@ export function ChatInterface({ messages, isLoading }) {
             className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[70%] rounded-full px-8 py-4 ${
+              className={`max-w-[65%] rounded-full px-8 py-4 ${
                 message.isUser
                   ? 'bg-black text-gray-50'
                   : ''
@@ -36,5 +48,5 @@ export function ChatInterface({ messages, isLoading }) {
         <div ref={messagesEndRef} />
       </div>
     </div>
-  );
+  )
 } 

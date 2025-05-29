@@ -1,48 +1,63 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+'use client'
 
-function groupChatsByDate(chatHistory) {
-  const today = new Date();
-  const yesterday = new Date();
-  yesterday.setDate(today.getDate() - 1);
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(today.getDate() - 7);
+import React, { useState } from 'react'
+import Link from 'next/link'
+import { usePathname, useSearchParams } from 'next/navigation'
 
-  const groups = {
+interface Chat {
+  timestamp: string
+  firstMessage: string
+}
+
+interface SidebarProps {
+  chatHistory?: Chat[]
+  collapsed: boolean
+  setCollapsed: (collapsed: boolean) => void
+}
+
+function groupChatsByDate(chatHistory: Chat[]) {
+  const today = new Date()
+  const yesterday = new Date()
+  yesterday.setDate(today.getDate() - 1)
+  const sevenDaysAgo = new Date()
+  sevenDaysAgo.setDate(today.getDate() - 7)
+
+  const groups: { [key: string]: Chat[] } = {
     Today: [],
     Yesterday: [],
     'Previous 7 Days': [],
     Older: [],
-  };
+  }
 
   chatHistory.forEach(chat => {
-    const chatDate = new Date(chat.timestamp);
+    const chatDate = new Date(chat.timestamp)
     if (
       chatDate.getDate() === today.getDate() &&
       chatDate.getMonth() === today.getMonth() &&
       chatDate.getFullYear() === today.getFullYear()
     ) {
-      groups.Today.push(chat);
+      groups.Today.push(chat)
     } else if (
       chatDate.getDate() === yesterday.getDate() &&
       chatDate.getMonth() === yesterday.getMonth() &&
       chatDate.getFullYear() === yesterday.getFullYear()
     ) {
-      groups.Yesterday.push(chat);
+      groups.Yesterday.push(chat)
     } else if (chatDate > sevenDaysAgo) {
-      groups['Previous 7 Days'].push(chat);
+      groups['Previous 7 Days'].push(chat)
     } else {
-      groups.Older.push(chat);
+      groups.Older.push(chat)
     }
-  });
-  return groups;
+  })
+  return groups
 }
 
-export default function Sidebar({ chatHistory = [], collapsed, setCollapsed }) {
-  const location = useLocation();
-  const grouped = groupChatsByDate(chatHistory);
-  const groupOrder = ['Today', 'Yesterday', 'Previous 7 Days', 'Older'];
-  const activeInitialMessage = location.pathname === '/chat' && location.state?.initialMessage;
+export default function Sidebar({ chatHistory = [], collapsed, setCollapsed }: SidebarProps) {
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const grouped = groupChatsByDate(chatHistory)
+  const groupOrder = ['Today', 'Yesterday', 'Previous 7 Days', 'Older']
+  const activeInitialMessage = pathname === '/chat' && searchParams.get('message')
 
   if (collapsed) {
     return (
@@ -50,12 +65,12 @@ export default function Sidebar({ chatHistory = [], collapsed, setCollapsed }) {
         <button onClick={() => setCollapsed(false)} className="p-1 rounded-full hover:bg-gray-100 transition">
           <img src="/icons/sidebar-icon.svg" alt="App Icon" className="w-6 h-6" />
         </button>
-        <Link to="/home" className="p-1 rounded-full hover:bg-gray-100 transition" aria-label="New Chat">
+        <Link href="/home" className="p-1 rounded-full hover:bg-gray-100 transition" aria-label="New Chat">
           <img src="/icons/newChat.svg" alt="New Chat" className="w-7 h-7" />
         </Link>
-        <Link to="/home" className="text-[24px] font-medium ml-4">onTrack</Link>
+        <Link href="/home" className="text-[24px] font-medium ml-4">onTrack</Link>
       </div>
-    );
+    )
   }
 
   return (
@@ -65,7 +80,7 @@ export default function Sidebar({ chatHistory = [], collapsed, setCollapsed }) {
         <button onClick={() => setCollapsed(true)} className="p-1 rounded-full hover:bg-gray-100 transition">
           <img src="/icons/sidebar-icon.svg" alt="App Icon" className="w-6 h-6" />
         </button>
-        <Link to="/home" className="p-1 rounded-full hover:bg-gray-100 transition" aria-label="New Chat">
+        <Link href="/home" className="p-1 rounded-full hover:bg-gray-100 transition" aria-label="New Chat">
           <img src="/icons/newChat.svg" alt="New Chat" className="w-7 h-7" />
         </Link>
       </div>
@@ -78,18 +93,17 @@ export default function Sidebar({ chatHistory = [], collapsed, setCollapsed }) {
                 <div className="uppercase text-xs text-gray-400 font-semibold px-4 mb-2 tracking-wider">{group}</div>
                 <ul className="flex flex-col gap-2 px-2">
                   {grouped[group].map((chat, index) => {
-                    const isActive = chat.firstMessage === activeInitialMessage;
+                    const isActive = chat.firstMessage === activeInitialMessage
                     return (
                       <li key={index}>
                         <Link
-                          to="/chat"
-                          state={{ initialMessage: chat.firstMessage }}
+                          href={`/chat?message=${encodeURIComponent(chat.firstMessage)}`}
                           className={`block p-3 rounded-lg hover:bg-gray-100 transition-colors text-gray-600 hover:text-gray-900 ${isActive ? 'bg-gray-200' : ''}`}
                         >
                           <div className="text-sm font-medium truncate">{chat.firstMessage}</div>
                         </Link>
                       </li>
-                    );
+                    )
                   })}
                 </ul>
               </div>
@@ -100,5 +114,5 @@ export default function Sidebar({ chatHistory = [], collapsed, setCollapsed }) {
         )}
       </div>
     </aside>
-  );
+  )
 } 

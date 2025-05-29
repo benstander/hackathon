@@ -1,81 +1,84 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import Sidebar from '../components/sidebar';
-import { ChatInterface } from '../components/ChatInterface';
-import { Link } from 'react-router-dom';
-import { api } from '../services/api';
-import { useFinancial } from '../context/FinancialContext';
+'use client'
 
-function useInitialMessage() {
-  const location = useLocation();
-  return location.state?.initialMessage || '';
+import React, { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import Sidebar from '../../components/sidebar'
+import { ChatInterface } from '../../components/ChatInterface'
+import { api } from '../../services/api'
+import { useFinancial } from '../context/FinancialContext'
+
+interface Message {
+  text: string
+  isUser: boolean
 }
 
 function getSavedHistory() {
-  const saved = localStorage.getItem('chatHistory');
-  return saved ? JSON.parse(saved) : [];
+  if (typeof window === 'undefined') return []
+  const saved = localStorage.getItem('chatHistory')
+  return saved ? JSON.parse(saved) : []
 }
 
 export default function ChatPage() {
-  const initialMessage = useInitialMessage();
-  const navigate = useNavigate();
-  const [chatInput, setChatInput] = useState('');
-  const [messages, setMessages] = useState([]);
-  const [chatHistory, setChatHistory] = useState(getSavedHistory());
-  const [isLoading, setIsLoading] = useState(false);
-  const { userData } = useFinancial();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [hasProcessedInitialMessage, setHasProcessedInitialMessage] = useState(false);
+  const searchParams = useSearchParams()
+  const initialMessage = searchParams.get('message') || ''
+  const [chatInput, setChatInput] = useState('')
+  const [messages, setMessages] = useState<Message[]>([])
+  const [chatHistory, setChatHistory] = useState(getSavedHistory())
+  const [isLoading, setIsLoading] = useState(false)
+  const { userData } = useFinancial()
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [hasProcessedInitialMessage, setHasProcessedInitialMessage] = useState(false)
 
   // Load chat history on mount and set up storage listener
   useEffect(() => {
     // Initial load
-    setChatHistory(getSavedHistory());
+    setChatHistory(getSavedHistory())
 
     // Listen for changes in localStorage
     const handleStorageChange = () => {
-      setChatHistory(getSavedHistory());
-    };
+      setChatHistory(getSavedHistory())
+    }
 
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
 
   // Handle initial message and chat history
   useEffect(() => {
     if (initialMessage && messages.length === 0 && !hasProcessedInitialMessage) {
-      setHasProcessedInitialMessage(true);
-      const newMessage = { text: initialMessage, isUser: true };
-      setMessages([newMessage]);
-      setChatInput('');
-      setIsLoading(true);
+      setHasProcessedInitialMessage(true)
+      const newMessage = { text: initialMessage, isUser: true }
+      setMessages([newMessage])
+      setChatInput('')
+      setIsLoading(true)
 
       // Call the AI API for the initial message
       const fetchAIResponse = async () => {
         try {
-          const response = await api.askAI('fb919047-167b-4b33-9cfc-ab963c780166', initialMessage);
+          const response = await api.askAI('fb919047-167b-4b33-9cfc-ab963c780166', initialMessage)
           setMessages(prev => [
             ...prev,
             { text: response.response, isUser: false }
-          ]);
+          ])
         } catch (error) {
-          console.error('AI Response Error:', error);
+          console.error('AI Response Error:', error)
           setMessages(prev => [
             ...prev,
-            { text: `Error: ${error.message || 'Sorry, I encountered an error.'}`, isUser: false }
-          ]);
+            { text: `Error: ${error instanceof Error ? error.message : 'Sorry, I encountered an error.'}`, isUser: false }
+          ])
         } finally {
-          setIsLoading(false);
+          setIsLoading(false)
         }
-      };
+      }
 
-      fetchAIResponse();
+      fetchAIResponse()
     }
-  }, [initialMessage, hasProcessedInitialMessage]);
+  }, [initialMessage, hasProcessedInitialMessage])
 
-  const handleChatSend = async (e) => {
-    e.preventDefault();
-    if (chatInput.trim() === '') return;
+  const handleChatSend = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (chatInput.trim() === '') return
 
     // Prevent duplicate initial message
     if (
@@ -83,48 +86,41 @@ export default function ChatPage() {
       chatInput.trim() === initialMessage &&
       messages.some(m => m.text === initialMessage && m.isUser)
     ) {
-      setChatInput('');
-      return;
+      setChatInput('')
+      return
     }
 
-    const userMessage = { text: chatInput.trim(), isUser: true };
+    const userMessage = { text: chatInput.trim(), isUser: true }
 
-    setMessages(prev => [...prev, userMessage]);
-    setChatInput('');
-    setIsLoading(true);
+    setMessages(prev => [...prev, userMessage])
+    setChatInput('')
+    setIsLoading(true)
 
     try {
-      const response = await api.askAI(userData?.id, chatInput.trim());
-      setMessages(prev => [...prev, { text: response.response, isUser: false }]);
+      const response = await api.askAI(userData?.id, chatInput.trim())
+      setMessages(prev => [...prev, { text: response.response, isUser: false }])
     } catch (error) {
-      console.error('AI Response Error:', error);
-      setMessages(prev => [...prev, { text: `Error: ${error.message || 'Sorry, I encountered an error.'}`, isUser: false }]);
+      console.error('AI Response Error:', error)
+      setMessages(prev => [...prev, { text: `Error: ${error instanceof Error ? error.message : 'Sorry, I encountered an error.'}`, isUser: false }])
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
-
-  console.log("Rendering ChatPage with messages:", messages);
-
-  if (!Array.isArray(messages)) {
-    console.error("Messages is not an array:", messages);
   }
 
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar chatHistory={chatHistory} collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
       <main className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${sidebarCollapsed ? 'ml-0' : 'ml-[260px]'}`}>
-        
         {/* Top Bar */}
         <div className="flex items-center justify-between h-20 px-16">
-          <Link to="/home" className="text-[24px] font-medium">onTrack</Link>
+          <Link href="/home" className="text-[24px] font-medium">onTrack</Link>
           <div className="flex items-center gap-2">
-            <Link to="/offers" className="flex items-center gap-2 border px-8 py-3 rounded-full text-sm font-medium hover:bg-gray-100">
+            <Link href="/offers" className="flex items-center gap-2 border px-8 py-3 rounded-full text-sm font-medium hover:bg-gray-100">
               Your Offers
             </Link>
-            <a href="/settings" className="w-12 h-12 rounded-full border flex items-center justify-center bg-grey-50 mr-2">
+            <Link href="/settings" className="w-12 h-12 rounded-full border flex items-center justify-center bg-grey-50 mr-2">
               <img src="/icons/settings-icon.svg" alt="Settings" className="w-6 h-6" />
-            </a>
+            </Link>
             <div className="w-12 h-12 rounded-full border flex items-center justify-center bg-grey-50">
               <img src="/icons/account-icon.svg" alt="Account" className="w-6 h-6" />
             </div>
@@ -161,5 +157,5 @@ export default function ChatPage() {
         </div>
       </main>
     </div>
-  );
+  )
 } 
