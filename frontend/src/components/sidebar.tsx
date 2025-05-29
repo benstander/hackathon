@@ -65,10 +65,10 @@ export default function Sidebar({ chatHistory = [], collapsed, setCollapsed }: S
         <button onClick={() => setCollapsed(false)} className="p-1 rounded-full hover:bg-gray-100 transition">
           <img src="/icons/sidebar-icon.svg" alt="App Icon" className="w-6 h-6" />
         </button>
-        <Link href="/home" className="p-1 rounded-full hover:bg-gray-100 transition" aria-label="New Chat">
+        <Link href="/" className="p-1 rounded-full hover:bg-gray-100 transition" aria-label="New Chat">
           <img src="/icons/newChat.svg" alt="New Chat" className="w-7 h-7" />
         </Link>
-        <Link href="/home" className="text-[24px] font-medium ml-4">onTrack</Link>
+        <Link href="/" className="text-[24px] font-medium ml-4">onTrack</Link>
       </div>
     )
   }
@@ -80,7 +80,7 @@ export default function Sidebar({ chatHistory = [], collapsed, setCollapsed }: S
         <button onClick={() => setCollapsed(true)} className="p-1 rounded-full hover:bg-gray-100 transition">
           <img src="/icons/sidebar-icon.svg" alt="App Icon" className="w-6 h-6" />
         </button>
-        <Link href="/home" className="p-1 rounded-full hover:bg-gray-100 transition" aria-label="New Chat">
+        <Link href="/" className="p-1 rounded-full hover:bg-gray-100 transition" aria-label="New Chat">
           <img src="/icons/newChat.svg" alt="New Chat" className="w-7 h-7" />
         </Link>
       </div>

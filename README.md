@@ -1,12 +1,36 @@
-# React + Vite
+# Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This directory contains all frontend-related code and configuration for the project.
 
-Currently, two official plugins are available:
+## Structure
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- `src/` - Source code
+- `public/` - Static assets
+- `node_modules/` - Dependencies
 
-## Expanding the ESLint configuration
+## Development
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+To start the development server:
+
+```bash
+npm install
+npm run dev
+```
+
+## Build
+
+To build for production:
+
+```bash
+npm run build
+```
+
+## Configuration Files
+
+- `vite.config.js` - Vite configuration
+- `tailwind.config.js` - Tailwind CSS configuration
+- `tsconfig.json` - TypeScript configuration
+- `package.json` - Dependencies and scripts
+- `postcss.config.cjs` - PostCSS configuration
+- `components.json` - UI components configuration
+- `eslint.config.js` - ESLint configuration 

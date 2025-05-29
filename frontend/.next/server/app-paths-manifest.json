@@ -1,0 +1,6 @@
+{
+  "/not-found": "app/not-found.js",
+  "/page": "app/page.js",
+  "/offers/page": "app/offers/page.js",
+  "/api/basiq/user/[userId]/route": "app/api/basiq/user/[userId]/route.js"
+}
