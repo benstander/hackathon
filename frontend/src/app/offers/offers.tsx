@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Sidebar from '../../components/sidebar'
-import { useFinancial } from '../context/FinancialContext'
+import { useFinancial } from '../../context/FinancialContext'
 
 interface Offer {
   type: string

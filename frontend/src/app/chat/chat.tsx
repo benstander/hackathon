@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation'
 import Sidebar from '../../components/sidebar'
 import { ChatInterface } from '../../components/ChatInterface'
 import { api } from '../../services/api'
-import { useFinancial } from '../context/FinancialContext'
+import { useFinancial } from '../../context/FinancialContext'
 
 interface Message {
   text: string
