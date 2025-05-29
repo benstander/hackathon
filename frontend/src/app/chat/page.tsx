@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import Sidebar from '../../components/sidebar'
 import { ChatInterface } from '../../components/ChatInterface'
 import { api } from '../../services/api'
@@ -21,6 +21,7 @@ function getSavedHistory() {
 
 export default function ChatPage() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const initialMessage = searchParams.get('message') || ''
   const [chatInput, setChatInput] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
@@ -74,7 +75,7 @@ export default function ChatPage() {
 
       fetchAIResponse()
     }
-  }, [initialMessage, hasProcessedInitialMessage])
+  }, [initialMessage, messages.length, hasProcessedInitialMessage])
 
   const handleChatSend = async (e: React.FormEvent) => {
     e.preventDefault()
