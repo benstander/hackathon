@@ -1,54 +1,74 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import Sidebar from '../components/sidebar';
-import { ChatInterface } from '../components/ChatInterface';
+'use client'
 
-function getSavedHistory() {
-  const saved = localStorage.getItem('chatHistory');
-  return saved ? JSON.parse(saved) : [];
+import React, { useState, useEffect, useRef } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import Sidebar from '../components/sidebar'
+import { ChatInterface } from '../components/ChatInterface'
+
+interface Offer {
+  type: string
+  details: string
 }
 
-function Home() {
-  const [showChat, setShowChat] = useState(false);
-  const [initialQuery, setInitialQuery] = useState('');
-  const [chatHistory, setChatHistory] = useState(getSavedHistory());
-  const navigate = useNavigate();
-  const fileInputRef = useRef(null);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [showAllOffers, setShowAllOffers] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+interface Message {
+  text: string
+  isUser: boolean
+}
+
+function getSavedHistory() {
+  if (typeof window === 'undefined') return []
+  const saved = localStorage.getItem('chatHistory')
+  return saved ? JSON.parse(saved) : []
+}
+
+export default function Home() {
+  const [showChat, setShowChat] = useState(false)
+  const [initialQuery, setInitialQuery] = useState('')
+  const [chatHistory, setChatHistory] = useState(getSavedHistory())
+  const [messages, setMessages] = useState<Message[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [showAllOffers, setShowAllOffers] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   // Load chat history on mount and set up storage listener
   useEffect(() => {
     // Initial load
-    setChatHistory(getSavedHistory());
+    setChatHistory(getSavedHistory())
 
     // Listen for changes in localStorage
     const handleStorageChange = () => {
-      setChatHistory(getSavedHistory());
-    };
+      setChatHistory(getSavedHistory())
+    }
 
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
 
-  const handleInitialSend = (e) => {
-    e.preventDefault();
-    if (initialQuery.trim() === '') return;
-    navigate('/chat', { state: { initialMessage: initialQuery } });
-  };
+  const handleInitialSend = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (initialQuery.trim() === '') return
+    setShowChat(true)
+    setMessages([{ text: initialQuery, isUser: true }])
+    setIsLoading(true)
+    // TODO: Add API call to get response
+    setIsLoading(false)
+  }
 
-  const handlePlusClick = (e) => {
-    e.preventDefault();
-    if (fileInputRef.current) fileInputRef.current.click();
-  };
+  const handlePlusClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (fileInputRef.current) fileInputRef.current.click()
+  }
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setSelectedFile(file);
-  };
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null
+    setSelectedFile(file)
+  }
 
-  const offers = [
+  const offers: Offer[] = [
     { type: "NRMA", details: "Get 20% off your first year of car insurance" },
     { type: "Alinta Energy", details: "Switch & save up to $300 annually" },
     { type: "Stake", details: "Start investing with as little as $100" },
@@ -59,26 +79,26 @@ function Home() {
     { type: "Life Insurance", details: "Protect your loved ones with flexible plans" },
     { type: "Travel Insurance", details: "Worldwide coverage with medical protection" },
     { type: "Pet Insurance", details: "Cover your furry friends with our pet care plans" }
-  ];
+  ]
 
   // Helper to get category by offer type
-  const getCategory = (type) => {
-    if (["NRMA", "Home Insurance", "Life Insurance", "Travel Insurance", "Pet Insurance", "AAMI"].some(t => type.includes(t))) return "Insurance";
-    if (["Commbank", "CommBank", "ANZ", "Westpac", "NAB", "ING", "Macquarie", "UBank", "Bendigo Bank"].some(t => type.includes(t))) return "Banking";
-    if (["Stake", "Raiz", "Spaceship", "Vanguard", "Bell Direct"].some(t => type.includes(t))) return "Investing";
-    if (["Alinta Energy", "Origin Energy", "AGL", "Energy Australia", "Powershop", "Red Energy", "Dodo", "Tango Energy"].some(t => type.includes(t))) return "Energy";
-    return null;
-  };
+  const getCategory = (type: string) => {
+    if (["NRMA", "Home Insurance", "Life Insurance", "Travel Insurance", "Pet Insurance", "AAMI"].some(t => type.includes(t))) return "Insurance"
+    if (["Commbank", "CommBank", "ANZ", "Westpac", "NAB", "ING", "Macquarie", "UBank", "Bendigo Bank"].some(t => type.includes(t))) return "Banking"
+    if (["Stake", "Raiz", "Spaceship", "Vanguard", "Bell Direct"].some(t => type.includes(t))) return "Investing"
+    if (["Alinta Energy", "Origin Energy", "AGL", "Energy Australia", "Powershop", "Red Energy", "Dodo", "Tango Energy"].some(t => type.includes(t))) return "Energy"
+    return null
+  }
 
-  const getBg = (category) => {
+  const getBg = (category: string | null) => {
     switch (category) {
-      case "Insurance": return "/images/spending-bg.png";
-      case "Investing": return "/images/budget-bg.png";
-      case "Energy": return "/images/income-bg.png";
-      case "Banking": return "/images/savings-bg.png";
-      default: return null;
+      case "Insurance": return "/images/spending-bg.png"
+      case "Investing": return "/images/budget-bg.png"
+      case "Energy": return "/images/income-bg.png"
+      case "Banking": return "/images/savings-bg.png"
+      default: return null
     }
-  };
+  }
 
   return (
     <div className="flex min-h-screen bg-white font-sans">
@@ -89,10 +109,10 @@ function Home() {
         <div className="flex items-center justify-between h-20 px-16">
           <div className="text-[24px] font-medium">onTrack</div>
           <div className="flex items-center gap-2">
-            <Link to="/offers" className="flex items-center gap-2 border px-8 py-3 rounded-full text-black text-sm font-medium hover:bg-gray-100 shadow-sm border border-gray-300 border border-gray-300">
+            <Link href="/offers" className="flex items-center gap-2 border px-8 py-3 rounded-full text-black text-sm font-medium hover:bg-gray-100 shadow-sm border border-gray-300 border border-gray-300">
               Your Offers
             </Link>
-            <Link to="/settings" className="w-12 h-12 rounded-full border flex items-center justify-center bg-grey-50 shadow-sm border border-gray-300 mr-2 hover:bg-gray-100">
+            <Link href="/settings" className="w-12 h-12 rounded-full border flex items-center justify-center bg-grey-50 shadow-sm border border-gray-300 mr-2 hover:bg-gray-100">
               <img src="/icons/settings-icon.svg" alt="Settings" className="w-6 h-6" />
             </Link>
             <div className="w-12 h-12 rounded-full border flex items-center justify-center bg-grey-50 border border-gray-300 hover:bg-gray-100 shadow-sm">
@@ -151,7 +171,13 @@ function Home() {
                     key={p.type + p.prompt}
                     type="button"
                     className="w-[200px] h-[140px] rounded-[10px] flex flex-col items-start justify-between px-8 pt-6 pb-6 bg-white border border-gray-300 shadow-md transition text-left relative text-black"
-                    onClick={() => navigate('/chat', { state: { initialMessage: p.prompt } })}
+                    onClick={() => {
+                      setShowChat(true)
+                      setMessages([{ text: p.prompt, isUser: true }])
+                      setIsLoading(true)
+                      // TODO: Add API call to get response
+                      setIsLoading(false)
+                    }}
                   >
                     <div className="font-bold text-base">{p.type}</div>
                     <div className="font-normal text-sm mt-2">{p.prompt}</div>
@@ -163,7 +189,7 @@ function Home() {
               <div className="w-full max-w-[1200px] mx-auto mt-20 mb-16">
                 <div className="w-[870px] mx-auto flex justify-between items-center mb-6">
                   <h2 className="text-[22px] font-medium ml-4">Popular Offers</h2>
-                  <Link to="/offers" className="text-black font-medium hover:bg-gray-200 px-4 py-2 rounded-[10px] transition mr-2">Show All</Link>
+                  <Link href="/offers" className="text-black font-medium hover:bg-gray-200 px-4 py-2 rounded-[10px] transition mr-2">Show All</Link>
                 </div>
                 <div className="relative">
                   <div className={`overflow-hidden pb-4 transition-all duration-300 ${showAllOffers ? '' : 'w-[872px]'}`}> {/* 4*200px + 3*16px gap */}
@@ -186,12 +212,10 @@ function Home() {
         ) : (
           // Chat Interface
           <div className="flex-1 bg-white border-t border-gray-200">
-            <ChatInterface initialMessage={initialQuery} />
+            <ChatInterface messages={messages} isLoading={isLoading} />
           </div>
         )}
       </main>
     </div>
-  );
-}
-
-export default Home; 
+  )
+} 

@@ -1,14 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import Sidebar from '../components/sidebar';
-import { useFinancial } from '../context/FinancialContext';
+'use client'
 
-function getSavedHistory() {
-  const saved = localStorage.getItem('chatHistory');
-  return saved ? JSON.parse(saved) : [];
+import React, { useState, useEffect } from 'react'
+import Link from 'next/link'
+import Sidebar from '../../components/sidebar'
+import { useFinancial } from '../../context/FinancialContext'
+
+interface Offer {
+  type: string
+  details: string
 }
 
-const offersByCategory = {
+interface OffersByCategory {
+  [key: string]: Offer[]
+}
+
+const offersByCategory: OffersByCategory = {
   Insurance: [
     { type: 'NRMA', details: '20% off car insurance through multi-policy' },
     { type: 'AAMI', details: '15% off bundling home & contents' },
@@ -49,37 +55,34 @@ const offersByCategory = {
     { type: 'UBank', details: '4.5% interest on savings' },
     { type: 'Bendigo Bank', details: '$50 cashback + 5.99% home loan' },
   ],
-};
-
-// Helper to extract potential savings from details
-function getPotentialSavings(details) {
-  const match = details.match(/\$([0-9,]+)/);
-  if (match) return `$${match[1]}`;
-  const percentMatch = details.match(/([0-9]{1,2})%/);
-  if (percentMatch) return `${percentMatch[1]}%`;
-  return 'Varies';
 }
 
-export default function Offers() {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [chatHistory, setChatHistory] = useState(getSavedHistory());
-  const [expandedOffer, setExpandedOffer] = useState(null);
+function getSavedHistory() {
+  if (typeof window === 'undefined') return []
+  const saved = localStorage.getItem('chatHistory')
+  return saved ? JSON.parse(saved) : []
+}
+
+export default function OffersPage() {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [chatHistory, setChatHistory] = useState(getSavedHistory())
+  const [expandedOffer, setExpandedOffer] = useState<Offer & { category: string } | null>(null)
 
   useEffect(() => {
-    setChatHistory(getSavedHistory());
-    const handleStorageChange = () => setChatHistory(getSavedHistory());
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+    setChatHistory(getSavedHistory())
+    const handleStorageChange = () => setChatHistory(getSavedHistory())
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
 
   useEffect(() => {
     if (expandedOffer) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden'
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = ''
     }
-    return () => { document.body.style.overflow = ''; };
-  }, [expandedOffer]);
+    return () => { document.body.style.overflow = '' }
+  }, [expandedOffer])
 
   return (
     <div className="flex min-h-screen bg-white font-sans">
@@ -87,12 +90,12 @@ export default function Offers() {
       <main className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${sidebarCollapsed ? 'ml-0' : 'ml-[260px]'}`}>
         {/* Top Bar */}
         <div className="flex items-center justify-between h-20 px-16">
-          <Link to="/home" className="text-[24px] font-medium">onTrack</Link>
+          <Link href="/" className="text-[24px] font-medium">onTrack</Link>
           <div className="flex items-center gap-2 px-16 max-w-[1200px]">
-            <Link to="/offers" className="flex items-center gap-2 border px-8 py-3 rounded-full text-sm font-medium hover:bg-gray-100">
+            <Link href="/offers" className="flex items-center gap-2 border px-8 py-3 rounded-full text-sm font-medium hover:bg-gray-100">
               Your Offers
             </Link>
-            <Link to="/settings" className="w-12 h-12 rounded-full border flex items-center justify-center bg-grey-50 mr-2">
+            <Link href="/settings" className="w-12 h-12 rounded-full border flex items-center justify-center bg-grey-50 mr-2">
               <img src="/icons/settings-icon.svg" alt="Settings" className="w-6 h-6" />
             </Link>
             <div className="w-12 h-12 rounded-full border flex items-center justify-center bg-grey-50">
@@ -151,5 +154,5 @@ export default function Offers() {
         </div>
       </main>
     </div>
-  );
+  )
 } 
