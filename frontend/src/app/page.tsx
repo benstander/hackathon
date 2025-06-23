@@ -159,25 +159,9 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen bg-white font-sans">
-      <Sidebar chatHistory={chatHistory} collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
+      <Sidebar chatHistory={chatHistory} />
       {/* Main Content */}
       <main className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${sidebarCollapsed ? 'ml-0' : 'ml-[260px]'}`}>
-        {/* Top Bar */}
-        <div className="flex items-center justify-between h-20 px-16">
-          <div className="text-[24px] font-medium">onTrack</div>
-          <div className="flex items-center gap-2">
-            <Link href="/offers" className="flex items-center gap-2 border px-8 py-3 rounded-full text-black text-sm font-medium hover:bg-gray-100 shadow-sm border border-gray-300 border border-gray-300">
-              Your Offers
-            </Link>
-            <Link href="/settings" className="w-12 h-12 rounded-full border flex items-center justify-center bg-grey-50 shadow-sm border border-gray-300 mr-2 hover:bg-gray-100">
-              <img src="/icons/settings-icon.svg" alt="Settings" className="w-6 h-6" />
-            </Link>
-            <div className="w-12 h-12 rounded-full border flex items-center justify-center bg-grey-50 border border-gray-300 hover:bg-gray-100 shadow-sm">
-              <img src="/icons/account-icon.svg" alt="Account" className="w-6 h-6" />
-            </div>
-          </div>
-        </div>
-
         {!showChat ? (
           // Initial Search Interface
           <div className="flex flex-col items-center justify-center flex-1 mt-24">
@@ -234,29 +218,6 @@ export default function Home() {
                     <div className="font-normal text-sm mt-2">{p.prompt}</div>
                   </button>
                 ))}
-              </div>
-
-              {/* Offers section */}
-              <div className="w-full max-w-[1200px] mx-auto mt-20 mb-16">
-                <div className="w-[870px] mx-auto flex justify-between items-center mb-6">
-                  <h2 className="text-[22px] font-medium ml-4">Popular Offers</h2>
-                  <Link href="/offers" className="text-black font-medium hover:bg-gray-200 px-4 py-2 rounded-[10px] transition mr-2">Show All</Link>
-                </div>
-                <div className="relative">
-                  <div className={`overflow-hidden pb-4 transition-all duration-300 ${showAllOffers ? '' : 'w-[872px]'}`}> {/* 4*200px + 3*16px gap */}
-                    <div className="flex gap-4 min-w-max ml-4">
-                      {(showAllOffers ? offers : offers.slice(0, 4)).map(offer => (
-                        <div
-                          key={offer.type}
-                          className="w-[200px] h-[140px] rounded-[10px] flex flex-col items-start justify-between px-8 pt-6 pb-6 bg-white border border-gray-300 shadow-md transition cursor-pointer"
-                        >
-                          <div className="font-bold text-base">{offer.type}</div>
-                          <div className="font-normal text-[12px] mt-2">{offer.details}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>

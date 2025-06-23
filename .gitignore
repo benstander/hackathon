@@ -63,4 +63,15 @@ node_modules/
 
 # Task files
 # tasks.json
-# tasks/ 
+# tasks/
+
+# Ignore all environment variable files
+.env
+.env.*
+.env*.local
+/frontend/.env
+/frontend/.env.*
+/frontend/.env*.local
+/backend/.env
+/backend/.env.*
+/backend/.env*.local 

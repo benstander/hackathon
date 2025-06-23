@@ -2,8 +2,10 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
-import { usePathname, useSearchParams } from 'next/navigation'
+import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { useAuth } from '../context/AuthContext'
+import Image from 'next/image'
+import ProfileDropdown from './ProfileDropdown'
 
 interface Chat {
   timestamp: string
@@ -12,8 +14,6 @@ interface Chat {
 
 interface SidebarProps {
   chatHistory?: Chat[]
-  collapsed: boolean
-  setCollapsed: (collapsed: boolean) => void
 }
 
 function groupChatsByDate(chatHistory: Chat[]) {
@@ -53,51 +53,58 @@ function groupChatsByDate(chatHistory: Chat[]) {
   return groups
 }
 
-export default function Sidebar({ chatHistory = [], collapsed, setCollapsed }: SidebarProps) {
+const ICON_SIZE = 28
+
+export default function Sidebar({ chatHistory = [] }: SidebarProps) {
+  const [collapsed, setCollapsed] = useState(false)
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const { user, signOut } = useAuth()
+  const { user } = useAuth()
+  const router = useRouter()
   const grouped = groupChatsByDate(chatHistory)
   const groupOrder = ['Today', 'Yesterday', 'Previous 7 Days', 'Older']
   const activeInitialMessage = pathname === '/chat' && searchParams.get('message')
 
-  const handleLogout = async () => {
-    try {
-      await signOut()
-    } catch (error) {
-      console.error('Error signing out:', error)
-    }
-  }
-
-  if (collapsed) {
-    return (
-      <div className="fixed top-0 left-0 z-50 flex items-center h-20 px-8 bg-white gap-4">
-        <button onClick={() => setCollapsed(false)} className="p-1 rounded-full hover:bg-gray-100 transition">
-          <img src="/icons/sidebar-icon.svg" alt="App Icon" className="w-6 h-6" />
-        </button>
-        <Link href="/" className="p-1 rounded-full hover:bg-gray-100 transition" aria-label="New Chat">
-          <img src="/icons/newChat.svg" alt="New Chat" className="w-7 h-7" />
-        </Link>
-        <Link href="/" className="text-[24px] font-medium ml-4">onTrack</Link>
-      </div>
-    )
-  }
-
   return (
-    <aside className="fixed top-0 left-0 w-[260px] flex flex-col h-screen border-r border-gray-200 bg-white py-0 pr-4">
-      {/* Top: App Icon and New Chat Icon */}
-      <div className="flex items-center justify-between h-20 px-8 bg-white">
-        <button onClick={() => setCollapsed(true)} className="p-1 rounded-full hover:bg-gray-100 transition">
-          <img src="/icons/sidebar-icon.svg" alt="App Icon" className="w-6 h-6" />
+    <aside
+      className={`fixed top-0 left-0 h-screen border-r border-gray-200 bg-white py-0 z-30 flex flex-col transition-all duration-200 ${collapsed ? 'w-16' : 'w-[260px]'}`}
+    >
+      {/* Top: Kapital and Collapse Icon (always render button, only conditionally render text) */}
+      <div className={`flex items-center pt-6 pb-4 border-b border-gray-100 ${collapsed ? 'justify-center' : 'justify-between px-4'}`}>
+        {!collapsed && (
+          <button
+            className="text-lg font-bold text-primary hover:underline focus:underline bg-transparent border-none outline-none cursor-pointer"
+            onClick={() => router.replace('/')}
+            type="button"
+          >
+            Kapital
+          </button>
+        )}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="p-2 rounded hover:bg-gray-100 transition"
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          <Image src="/icons/sidebar-icon.svg" alt="Toggle sidebar" width={ICON_SIZE} height={ICON_SIZE} />
         </button>
-        <Link href="/" className="p-1 rounded-full hover:bg-gray-100 transition" aria-label="New Chat">
-          <img src="/icons/newChat.svg" alt="New Chat" className="w-7 h-7" />
-        </Link>
       </div>
-      
-      {/* Previous Chats */}
-      <div className="flex-1 overflow-y-auto pl-6 bg-white">
-        {groupOrder.map(
+
+      {/* Home button below logo, icon left, text right */}
+      <button
+        onClick={() => router.replace('/')}
+        className={`flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition w-11/12 mx-auto mt-2 ${collapsed ? 'justify-center' : ''}`}
+        title="Home"
+        type="button"
+      >
+        <span className="min-w-[28px] min-h-[28px] flex items-center justify-center">
+          <Image src="/icons/home-icon.svg" alt="Home" width={ICON_SIZE} height={ICON_SIZE} />
+        </span>
+        {!collapsed && <span className="text-sm font-medium text-gray-700">Home</span>}
+      </button>
+
+      {/* Middle: Previous Chats */}
+      <div className={`flex-1 overflow-y-auto bg-white ${collapsed ? 'pl-0' : 'pl-6'}`}>
+        {!collapsed && groupOrder.map(
           group =>
             grouped[group] && grouped[group].length > 0 && (
               <div key={group} className="mb-6">
@@ -120,35 +127,43 @@ export default function Sidebar({ chatHistory = [], collapsed, setCollapsed }: S
               </div>
             )
         )}
-        {chatHistory.length === 0 && (
-          <div className="text-gray-400 text-sm italic px-4 mt-8">No previous chats</div>
-        )}
       </div>
 
-      {/* Bottom: User Info and Logout */}
-      <div className="border-t border-gray-200 p-4 bg-white">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-              <span className="text-sm font-medium text-gray-600">
-                {user?.email?.charAt(0).toUpperCase() || 'U'}
+      {/* Bottom: Offers, Settings, Profile (vertically stacked) */}
+      <div className={`border-t border-gray-200 p-4 bg-white flex flex-col gap-2 ${collapsed ? 'items-center' : ''}`}>
+        <Link
+          href="/offers"
+          className={`flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition w-full ${collapsed ? 'justify-center' : ''}`}
+          title="Offers"
+        >
+          <span className="min-w-[28px] min-h-[28px] flex items-center justify-center">
+            <Image src="/icons/portfolio-icon.svg" alt="Offers" width={ICON_SIZE} height={ICON_SIZE} />
+          </span>
+          {!collapsed && <span className="text-sm font-medium text-gray-700">Offers</span>}
+        </Link>
+        <Link
+          href="/settings"
+          className={`flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition w-full ${collapsed ? 'justify-center' : ''}`}
+          title="Settings"
+        >
+          <span className="min-w-[28px] min-h-[28px] flex items-center justify-center">
+            <Image src="/icons/settings-icon.svg" alt="Settings" width={ICON_SIZE} height={ICON_SIZE} />
+          </span>
+          {!collapsed && <span className="text-sm font-medium text-gray-700">Settings</span>}
+        </Link>
+        {/* Profile button with icon and text, triggers dropdown */}
+        <div>
+          <ProfileDropdown>
+            <button
+              className={`flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition w-full ${collapsed ? 'justify-center' : ''}`}
+              type="button"
+            >
+              <span className="min-w-[28px] min-h-[28px] flex items-center justify-center">
+                <Image src="/icons/account-icon.svg" alt="Profile" width={ICON_SIZE} height={ICON_SIZE} />
               </span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">
-                {user?.email || 'User'}
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
-            title="Sign out"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-          </button>
+              {!collapsed && <span className="text-sm font-medium text-gray-700">Profile</span>}
+            </button>
+          </ProfileDropdown>
         </div>
       </div>
     </aside>

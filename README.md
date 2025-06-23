@@ -250,3 +250,9 @@ The chat functionality was not working because:
 - Sessions are managed securely by Supabase Auth
 - Route protection prevents unauthorized access
 - User data is isolated per authenticated user
+
+## Environment Variables
+
+- **Never commit `.env` or any environment variable files to version control.**
+- Add your secrets to a `.env` file locally, which is already gitignored.
+- If you need to share required variables, use a `.env.example` file with placeholder values.

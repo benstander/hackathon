@@ -86,24 +86,8 @@ export default function OffersPage() {
 
   return (
     <div className="flex min-h-screen bg-white font-sans">
-      <Sidebar chatHistory={chatHistory} collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
+      <Sidebar chatHistory={chatHistory} />
       <main className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${sidebarCollapsed ? 'ml-0' : 'ml-[260px]'}`}>
-        {/* Top Bar */}
-        <div className="flex items-center justify-between h-20 px-16">
-          <Link href="/" className="text-[24px] font-medium">onTrack</Link>
-          <div className="flex items-center gap-2 px-16 max-w-[1200px]">
-            <Link href="/offers" className="flex items-center gap-2 border px-8 py-3 rounded-full text-sm font-medium hover:bg-gray-100">
-              Your Offers
-            </Link>
-            <Link href="/settings" className="w-12 h-12 rounded-full border flex items-center justify-center bg-grey-50 mr-2">
-              <img src="/icons/settings-icon.svg" alt="Settings" className="w-6 h-6" />
-            </Link>
-            <div className="w-12 h-12 rounded-full border flex items-center justify-center bg-grey-50">
-              <img src="/icons/account-icon.svg" alt="Account" className="w-6 h-6" />
-            </div>
-          </div>
-        </div>
-        
         {/* Offers Content */}
         <div className="flex-1 bg-white py-12 px-4 ml-12">
           <div className="max-w-[1200px] mx-auto">
