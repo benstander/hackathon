@@ -1,0 +1,55 @@
+# Product Requirements Document (PRD)
+
+## Project Name
+Kapital (AI Budgeting & Financial Assistant)
+
+## Overview
+Kapital is an AI-powered budgeting and financial web app that interacts with users through a chat interface, acting as a financially savvy friend. The app aims to eliminate tedious manual data entry and confusing spreadsheets by providing proactive, conversational financial insights and advice.
+
+## Problem Statement
+Traditional budgeting tools require manual entry and are often abandoned due to friction and outdated data. Users, especially millennials, want to be financially responsible but dislike the effort and complexity of current solutions.
+
+## Solution
+Kapital flips the script by letting your money text you. Users interact with an AI assistant via a chat interface, receiving insights, categorization, and advice in natural language. The app automatically categorizes transactions, tracks spending patterns, and adapts its personality to match the user's communication style.
+
+## Target Users
+- Millennials who want to be financially responsible but dislike traditional budgeting tools
+- Expansion: Anyone seeking a conversational AI interface for financial management
+
+## Core Features (MVP)
+- User registration and authentication
+- Bank account integration via Basiq
+- Dashboard displaying main financial metrics (to be defined as project evolves)
+- Perplexity-like chat interface for users to initiate conversations with the AI assistant
+- AI assistant provides insights, answers, and advice based on user data (responds only to user-initiated chats)
+
+## User Experience
+- Flow: Sign up → Connect bank account → Access dashboard → Click chat button to start AI conversation
+- AI does not initiate conversations; only responds to user prompts
+- AI tone: Friendly, adaptive (can be refined later)
+
+## Technical Stack
+- Frontend: React.js (Next.js recommended)
+- Backend: Express.js
+- Database: Supabase
+- Bank integration: Basiq API
+
+## Privacy & Security
+- To be defined; default to industry best practices (data encryption, secure authentication, etc.)
+
+## Success Criteria
+- To be defined; will track user engagement and feedback as initial metrics
+
+## Constraints & Risks
+- To be defined as project progresses
+
+## Open Questions / To Be Defined
+- Specific dashboard metrics to display
+- Authentication method (email/password, OAuth, etc.)
+- Privacy, compliance, and security requirements
+- Success metrics and KPIs
+- Timeline, budget, and team constraints
+
+---
+
+*This PRD will be updated as more details are defined during development.* 
