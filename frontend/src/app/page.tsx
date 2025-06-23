@@ -7,6 +7,7 @@ import Sidebar from '../components/sidebar'
 import { ChatInterface } from '../components/ChatInterface'
 import { api } from '../services/api'
 import { useFinancial } from '../context/FinancialContext'
+import { useAuth } from '../context/AuthContext'
 
 interface Offer {
   type: string
@@ -36,6 +37,14 @@ export default function Home() {
   const [showAllOffers, setShowAllOffers] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const { userData } = useFinancial()
+  const { user, loading } = useAuth()
+
+  // Redirect to auth page if not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/auth')
+    }
+  }, [user, loading, router])
 
   // Load chat history on mount and set up storage listener
   useEffect(() => {
@@ -51,6 +60,27 @@ export default function Home() {
     return () => window.removeEventListener('storage', handleStorageChange)
   }, [])
 
+  // Show loading while checking authentication state
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center">
+          <div className="text-lg font-medium">Loading...</div>
+        </div>
+      </div>
+    )
+  }
+
+  // Don't render anything if user is not authenticated (will redirect)
+  if (!user) {
+    return null
+  }
+
+  // Helper function to get user ID (use authenticated user's ID or fallback)
+  const getUserId = () => {
+    return user?.id || userData?.id || 'fb919047-167b-4b33-9cfc-ab963c780166'
+  }
+
   const handleInitialSend = async (e: React.FormEvent) => {
     e.preventDefault()
     if (initialQuery.trim() === '') return
@@ -59,7 +89,7 @@ export default function Home() {
     setIsLoading(true)
     
     try {
-      const response = await api.askAI(userData?.id || 'fb919047-167b-4b33-9cfc-ab963c780166', initialQuery.trim())
+      const response = await api.askAI(getUserId(), initialQuery.trim())
       setMessages(prev => [...prev, { text: response.response, isUser: false }])
     } catch (error) {
       console.error('AI Response Error:', error)
@@ -77,6 +107,22 @@ export default function Home() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null
     setSelectedFile(file)
+  }
+
+  const handlePromptClick = async (prompt: string) => {
+    setShowChat(true)
+    setMessages([{ text: prompt, isUser: true }])
+    setIsLoading(true)
+    
+    try {
+      const response = await api.askAI(getUserId(), prompt)
+      setMessages(prev => [...prev, { text: response.response, isUser: false }])
+    } catch (error) {
+      console.error('AI Response Error:', error)
+      setMessages(prev => [...prev, { text: `Error: ${error instanceof Error ? error.message : 'Sorry, I encountered an error.'}`, isUser: false }])
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const offers: Offer[] = [
@@ -182,21 +228,7 @@ export default function Home() {
                     key={p.type + p.prompt}
                     type="button"
                     className="w-[200px] h-[140px] rounded-[10px] flex flex-col items-start justify-between px-8 pt-6 pb-6 bg-white border border-gray-300 shadow-md transition text-left relative text-black"
-                    onClick={async () => {
-                      setShowChat(true)
-                      setMessages([{ text: p.prompt, isUser: true }])
-                      setIsLoading(true)
-                      
-                      try {
-                        const response = await api.askAI(userData?.id || 'fb919047-167b-4b33-9cfc-ab963c780166', p.prompt)
-                        setMessages(prev => [...prev, { text: response.response, isUser: false }])
-                      } catch (error) {
-                        console.error('AI Response Error:', error)
-                        setMessages(prev => [...prev, { text: `Error: ${error instanceof Error ? error.message : 'Sorry, I encountered an error.'}`, isUser: false }])
-                      } finally {
-                        setIsLoading(false)
-                      }
-                    }}
+                    onClick={() => handlePromptClick(p.prompt)}
                   >
                     <div className="font-bold text-base">{p.type}</div>
                     <div className="font-normal text-sm mt-2">{p.prompt}</div>

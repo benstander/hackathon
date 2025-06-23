@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
+import { useAuth } from '../context/AuthContext'
 
 interface Chat {
   timestamp: string
@@ -55,9 +56,18 @@ function groupChatsByDate(chatHistory: Chat[]) {
 export default function Sidebar({ chatHistory = [], collapsed, setCollapsed }: SidebarProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const { user, signOut } = useAuth()
   const grouped = groupChatsByDate(chatHistory)
   const groupOrder = ['Today', 'Yesterday', 'Previous 7 Days', 'Older']
   const activeInitialMessage = pathname === '/chat' && searchParams.get('message')
+
+  const handleLogout = async () => {
+    try {
+      await signOut()
+    } catch (error) {
+      console.error('Error signing out:', error)
+    }
+  }
 
   if (collapsed) {
     return (
@@ -74,7 +84,7 @@ export default function Sidebar({ chatHistory = [], collapsed, setCollapsed }: S
   }
 
   return (
-    <aside className="fixed top-0 left-0 w-[260px] flex flex-col h-screen border-r border-gray-200 bg-white py-0 pr-4 gap-10">
+    <aside className="fixed top-0 left-0 w-[260px] flex flex-col h-screen border-r border-gray-200 bg-white py-0 pr-4">
       {/* Top: App Icon and New Chat Icon */}
       <div className="flex items-center justify-between h-20 px-8 bg-white">
         <button onClick={() => setCollapsed(true)} className="p-1 rounded-full hover:bg-gray-100 transition">
@@ -84,7 +94,8 @@ export default function Sidebar({ chatHistory = [], collapsed, setCollapsed }: S
           <img src="/icons/newChat.svg" alt="New Chat" className="w-7 h-7" />
         </Link>
       </div>
-      {/* Previous Chats Only */}
+      
+      {/* Previous Chats */}
       <div className="flex-1 overflow-y-auto pl-6 bg-white">
         {groupOrder.map(
           group =>
@@ -112,6 +123,33 @@ export default function Sidebar({ chatHistory = [], collapsed, setCollapsed }: S
         {chatHistory.length === 0 && (
           <div className="text-gray-400 text-sm italic px-4 mt-8">No previous chats</div>
         )}
+      </div>
+
+      {/* Bottom: User Info and Logout */}
+      <div className="border-t border-gray-200 p-4 bg-white">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+              <span className="text-sm font-medium text-gray-600">
+                {user?.email?.charAt(0).toUpperCase() || 'U'}
+              </span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {user?.email || 'User'}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+            title="Sign out"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+          </button>
+        </div>
       </div>
     </aside>
   )
