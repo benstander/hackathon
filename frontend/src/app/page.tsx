@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import Sidebar from '../components/sidebar'
 import { ChatInterface } from '../components/ChatInterface'
+import { api } from '../services/api'
+import { useFinancial } from '../context/FinancialContext'
 
 interface Offer {
   type: string
@@ -33,6 +35,7 @@ export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [showAllOffers, setShowAllOffers] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const { userData } = useFinancial()
 
   // Load chat history on mount and set up storage listener
   useEffect(() => {
@@ -48,14 +51,22 @@ export default function Home() {
     return () => window.removeEventListener('storage', handleStorageChange)
   }, [])
 
-  const handleInitialSend = (e: React.FormEvent) => {
+  const handleInitialSend = async (e: React.FormEvent) => {
     e.preventDefault()
     if (initialQuery.trim() === '') return
     setShowChat(true)
     setMessages([{ text: initialQuery, isUser: true }])
     setIsLoading(true)
-    // TODO: Add API call to get response
-    setIsLoading(false)
+    
+    try {
+      const response = await api.askAI(userData?.id || 'fb919047-167b-4b33-9cfc-ab963c780166', initialQuery.trim())
+      setMessages(prev => [...prev, { text: response.response, isUser: false }])
+    } catch (error) {
+      console.error('AI Response Error:', error)
+      setMessages(prev => [...prev, { text: `Error: ${error instanceof Error ? error.message : 'Sorry, I encountered an error.'}`, isUser: false }])
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handlePlusClick = (e: React.MouseEvent) => {
@@ -171,12 +182,20 @@ export default function Home() {
                     key={p.type + p.prompt}
                     type="button"
                     className="w-[200px] h-[140px] rounded-[10px] flex flex-col items-start justify-between px-8 pt-6 pb-6 bg-white border border-gray-300 shadow-md transition text-left relative text-black"
-                    onClick={() => {
+                    onClick={async () => {
                       setShowChat(true)
                       setMessages([{ text: p.prompt, isUser: true }])
                       setIsLoading(true)
-                      // TODO: Add API call to get response
-                      setIsLoading(false)
+                      
+                      try {
+                        const response = await api.askAI(userData?.id || 'fb919047-167b-4b33-9cfc-ab963c780166', p.prompt)
+                        setMessages(prev => [...prev, { text: response.response, isUser: false }])
+                      } catch (error) {
+                        console.error('AI Response Error:', error)
+                        setMessages(prev => [...prev, { text: `Error: ${error instanceof Error ? error.message : 'Sorry, I encountered an error.'}`, isUser: false }])
+                      } finally {
+                        setIsLoading(false)
+                      }
                     }}
                   >
                     <div className="font-bold text-base">{p.type}</div>
