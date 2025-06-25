@@ -1,9 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
-import Sidebar from '../../components/sidebar'
 import { ChatInterface } from '../../components/ChatInterface'
 import { api } from '../../services/api'
 import { useFinancial } from '../../context/FinancialContext'
@@ -28,7 +26,6 @@ export default function ChatPage() {
   const [chatHistory, setChatHistory] = useState(getSavedHistory())
   const [isLoading, setIsLoading] = useState(false)
   const { userData } = useFinancial()
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [hasProcessedInitialMessage, setHasProcessedInitialMessage] = useState(false)
 
   // Load chat history on mount and set up storage listener
@@ -116,46 +113,43 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-white">
-      <Sidebar chatHistory={chatHistory} />
-      <main className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${sidebarCollapsed ? 'ml-0' : 'ml-[260px]'}`}>
-        <div className="flex-1 bg-white flex flex-col justify-between">
-          <div className="flex-1 w-full overflow-y-auto">
-            <ChatInterface messages={messages} isLoading={isLoading} />
-          </div>
-
-          {/* Chat Input at Bottom */}
-          <div className="border-t border-gray-100 bg-white p-6">
-            <form onSubmit={handleChatSend} className="max-w-4xl mx-auto">
-              <div className="relative bg-gray-50 border border-gray-200 rounded-2xl shadow-sm focus-within:ring-2 focus-within:ring-black focus-within:border-transparent transition-all">
-                <textarea
-                  className="w-full bg-transparent outline-none border-none text-gray-800 text-[16px] p-4 pr-16 resize-none min-h-[60px] max-h-32"
-                  placeholder="Ask me anything about your finances..."
-                  value={chatInput}
-                  onChange={e => setChatInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  rows={1}
-                  style={{ minHeight: '60px' }}
-                />
-                <div className="absolute right-3 bottom-3">
-                  <button 
-                    type="submit"
-                    disabled={isLoading || chatInput.trim() === ''}
-                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-black text-white hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <div className="mt-2 text-xs text-gray-500 text-center">
-                Press Enter to send, Shift+Enter for new line
-              </div>
-            </form>
-          </div>
+    <div className="min-h-screen bg-white">
+      <div className="flex-1 bg-white flex flex-col justify-between">
+        <div className="flex-1 w-full overflow-y-auto">
+          <ChatInterface messages={messages} isLoading={isLoading} />
         </div>
-      </main>
+
+        {/* Chat Input at Bottom */}
+        <div className="border-t border-gray-100 bg-white p-6">
+          <form onSubmit={handleChatSend} className="max-w-4xl mx-auto">
+            <div className="relative bg-gray-50 border border-gray-200 rounded-2xl shadow-sm focus-within:ring-2 focus-within:ring-black focus-within:border-transparent transition-all">
+              <textarea
+                className="w-full bg-transparent outline-none border-none text-gray-800 text-[16px] p-4 pr-16 resize-none min-h-[60px] max-h-32"
+                placeholder="Ask me anything about your finances..."
+                value={chatInput}
+                onChange={e => setChatInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                rows={1}
+                style={{ minHeight: '60px' }}
+              />
+              <div className="absolute right-3 bottom-3">
+                <button 
+                  type="submit"
+                  disabled={isLoading || chatInput.trim() === ''}
+                  className="w-10 h-10 flex items-center justify-center rounded-xl bg-black text-white hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div className="mt-2 text-xs text-gray-500 text-center">
+              Press Enter to send, Shift+Enter for new line
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   )
 } 

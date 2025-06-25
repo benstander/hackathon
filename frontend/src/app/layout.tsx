@@ -3,8 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { FinancialProvider } from '../context/FinancialContext'
 import { AuthProvider } from '../context/AuthContext'
-// import Header from '../components/Header' // Remove header
-import Sidebar from '../components/sidebar'
+import Header from '../components/Header'
 import { StagewiseToolbar } from "@stagewise/toolbar-next";
 import { ReactPlugin } from "@stagewise-plugins/react";
 
@@ -25,8 +24,8 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <FinancialProvider>
-            <div className="flex min-h-screen">
-              <Sidebar />
+            <div className="flex flex-col min-h-screen">
+              <Header />
               <main className="flex-1">{children}</main>
             </div>
           </FinancialProvider>
