@@ -1,92 +1,170 @@
 const express = require("express");
 const router = express.Router();
+const { buildFinancePrompt } = require("../../logic/buildFinancePrompt");
 const { callGroqLLM } = require("../../gpt/groqClient");
-const { getUserById } = require("../../db/queries/users");
-const { getTransactionsByUserId } = require("../../db/queries/transactions");
-const buildFinancePrompt = require("../../logic/buildFinancePrompt");
-
-const {
+const { 
   getAccessToken, 
-  createUser, 
-  getClientToken, 
-  retrieveUser, 
-  listUserAccounts, 
-  retrieveUserAccount, 
-  listUserTransactions, 
-  retrieveUserTransaction
-} = require('../../Utils/basiqHelper')
+  listUserTransactions 
+} = require("../../Utils/basiqHelper");
+const { 
+  getUserById 
+} = require("../../db/queries/users");
+
+// Helper function to format currency
+const formatCurrency = (amount) => {
+  return new Intl.NumberFormat('en-AU', {
+    style: 'currency',
+    currency: 'AUD'
+  }).format(amount);
+};
 
 router.post("/", async (req, res) => {
   try {
     const { userId, question } = req.body;
 
     if (!userId || !question) {
-      return res.status(400).json({ error: "Missing userId or question" });
+      return res.status(400).json({ error: "User ID and question are required" });
     }
 
     let transactions = [];
     let income = 50000; // Default fallback income
+    let userHasRealData = false;
 
     try {
-      // Try to get real transaction data from Basiq
-      const accessToken = await getAccessToken();
-      const transactionObject = await listUserTransactions(accessToken, userId);
-      const transactionsData = transactionObject.data || [];
+      // Get user from database to check if they have a Basiq user ID
+      const user = await getUserById(userId);
+      
+      if (user?.basiq_user_id) {
+        console.log(`Using real Basiq data for user: ${user.basiq_user_id}`);
+        
+        // Try to get real transaction data from Basiq
+        const accessToken = await getAccessToken();
+        const transactionObject = await listUserTransactions(accessToken, user.basiq_user_id);
+        const transactionsData = transactionObject.data || [];
 
-      for (const transactionData of transactionsData) {
-        const transaction = {};
-    
-        // These classes have NO SUBCLASS OR UNKNOWN SUBCLASS
-        if (transactionData.class === 'transfer' 
-          || transactionData.class === 'bank-fee' 
-          || transactionData.class === 'direct-credit' 
-          || transactionData.class === 'cash-withdrawal'
-        ) {
-          if (transactionData.class === 'direct-credit') {
-            income += Number(transactionData.amount);
+        userHasRealData = true;
+        income = 0; // Reset income to calculate from actual data
+
+        for (const transactionData of transactionsData) {
+          const transaction = {};
+      
+          // These classes have NO SUBCLASS OR UNKNOWN SUBCLASS
+          if (transactionData.class === 'transfer' 
+            || transactionData.class === 'bank-fee' 
+            || transactionData.class === 'direct-credit' 
+            || transactionData.class === 'cash-withdrawal'
+          ) {
+            if (transactionData.class === 'direct-credit') {
+              income += Number(transactionData.amount);
+            }
+            transaction.category = transactionData.class;
+            transaction.amount = Number(transactionData.amount);
+            transaction.description = transactionData.description || '';
+            transaction.date = transactionData.postDate || transactionData.transactionDate;
+            transactions.push(transaction);
+          } else {
+            transaction.category = transactionData.subClass?.title || transactionData.class;
+            transaction.amount = Number(transactionData.amount);
+            transaction.description = transactionData.description || '';
+            transaction.date = transactionData.postDate || transactionData.transactionDate;
+            transactions.push(transaction);
           }
-          transaction.category = transactionData.class;
-          transaction.amount = Number(transactionData.amount);
-          transactions.push(transaction);
-        } else {
-          transaction.category = transactionData.subClass?.title || transactionData.class;
-          transaction.amount = Number(transactionData.amount);
-          transactions.push(transaction);
         }
+
+        // If no income detected from transactions, use a reasonable default
+        if (income === 0) {
+          income = 60000; // Default for users with real data but no detected income
+        }
+
+        console.log(`Processed ${transactions.length} real transactions for user ${userId}`);
+      } else {
+        console.log(`No Basiq user ID found for user ${userId}, using demo data`);
+        throw new Error("No real bank connection found");
       }
     } catch (basiqError) {
-      console.warn("Basiq API error, using fallback data:", basiqError.message);
-      // Use fallback transaction data if Basiq fails
+      console.warn("Using fallback demo data:", basiqError.message);
+      userHasRealData = false;
+      
+      // Use fallback transaction data if Basiq fails or user has no connection
       transactions = [
-        { category: 'Food & Dining', amount: 450 },
-        { category: 'Transportation', amount: 200 },
-        { category: 'Shopping', amount: 300 },
-        { category: 'Entertainment', amount: 150 },
-        { category: 'Utilities', amount: 180 }
+        { 
+          category: 'Food & Dining', 
+          amount: 450, 
+          description: 'Various restaurant and grocery purchases',
+          date: new Date().toISOString().split('T')[0]
+        },
+        { 
+          category: 'Transportation', 
+          amount: 200, 
+          description: 'Public transport and ride-sharing',
+          date: new Date().toISOString().split('T')[0]
+        },
+        { 
+          category: 'Shopping', 
+          amount: 300, 
+          description: 'Clothing and household items',
+          date: new Date().toISOString().split('T')[0]
+        },
+        { 
+          category: 'Entertainment', 
+          amount: 150, 
+          description: 'Movies, games, and subscriptions',
+          date: new Date().toISOString().split('T')[0]
+        },
+        { 
+          category: 'Utilities', 
+          amount: 180, 
+          description: 'Electricity, gas, and internet',
+          date: new Date().toISOString().split('T')[0]
+        }
       ];
+      income = 50000; // Default income for demo data
     }
 
     const user = {
       income: income,
-      savingsGoal: 10000
+      savingsGoal: 10000,
+      hasRealData: userHasRealData
     };
 
+    // Build the finance prompt with context about data source
     const prompt = buildFinancePrompt(user, transactions, question);
 
     const messages = [
-      { role: "system", content: "You are a helpful finance assistant. Provide clear, actionable advice based on the user's financial situation." },
+      { 
+        role: "system", 
+        content: `You are a helpful Australian finance assistant. Provide clear, actionable advice based on the user's financial situation. 
+        
+        ${userHasRealData 
+          ? "You are working with REAL financial data from the user's connected bank accounts. Be specific and reference actual transaction patterns when relevant."
+          : "You are working with DEMO/SAMPLE data since the user hasn't connected their bank account yet. Make it clear that connecting their bank would provide more personalized insights."
+        }
+        
+        Always format currency amounts in Australian dollars (AUD). When discussing spending patterns, be specific about timeframes and categories.` 
+      },
       { role: "user", content: prompt }
     ];
 
-    const reply = await callGroqLLM(messages);
-    res.json({ response: reply });
-  } catch (err) {
-    console.error("Prompt error:", err);
-    
-    // Provide a helpful fallback response if AI fails
-    const fallbackResponse = "I'm having trouble accessing your financial data right now, but I'm here to help! You can ask me general financial questions, and I'll do my best to provide helpful advice. Please try again in a moment.";
-    
-    res.json({ response: fallbackResponse });
+    const response = await callGroqLLM(messages);
+
+    // Add a note about data source if using demo data
+    let finalResponse = response;
+    if (!userHasRealData) {
+      finalResponse += "\n\n💡 *Note: This analysis is based on sample data. Connect your bank account for personalized insights based on your actual spending patterns.*";
+    }
+
+    res.json({ 
+      response: finalResponse,
+      dataSource: userHasRealData ? 'real' : 'demo',
+      transactionCount: transactions.length,
+      estimatedIncome: formatCurrency(income)
+    });
+
+  } catch (error) {
+    console.error("AI Response Error:", error);
+    res.status(500).json({ 
+      error: "Sorry, I encountered an error processing your request. Please try again." 
+    });
   }
 });
 

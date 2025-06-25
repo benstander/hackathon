@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { ChatInterface } from '../../components/ChatInterface'
 import { api } from '../../services/api'
@@ -17,7 +17,7 @@ function getSavedHistory() {
   return saved ? JSON.parse(saved) : []
 }
 
-export default function ChatPage() {
+function ChatPageContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const initialMessage = searchParams.get('message') || ''
@@ -151,5 +151,19 @@ export default function ChatPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ChatPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-lg font-medium">Loading chat...</div>
+        </div>
+      </div>
+    }>
+      <ChatPageContent />
+    </Suspense>
   )
 } 

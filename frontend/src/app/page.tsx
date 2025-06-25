@@ -4,9 +4,11 @@ import React, { useState, useEffect, useRef } from 'react'
 import Header from '../components/Header'
 import { useRouter } from 'next/navigation'
 import { ChatInterface } from '../components/ChatInterface'
+import { ConnectBank } from '../components/ConnectBank'
 import { api } from '../services/api'
 import { useFinancial } from '../context/FinancialContext'
 import { useAuth } from '../context/AuthContext'
+import { useBankConnection } from '../hooks/useBankConnection'
 
 interface Message {
   text: string
@@ -30,6 +32,7 @@ export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const { userData } = useFinancial()
   const { user, loading } = useAuth()
+  const { hasConnectedBanks, accounts, loading: bankLoading } = useBankConnection()
 
   // Redirect to auth page if not authenticated
   useEffect(() => {
@@ -117,17 +120,59 @@ export default function Home() {
     }
   }
 
-  // Placeholder for connect bank handler
-  const handleConnectBank = () => {
-    alert('Connect bank clicked!')
+  // Show bank connection prompt if no banks are connected
+  if (!bankLoading && !hasConnectedBanks && !showChat) {
+    return (
+      <div className="min-h-screen bg-white font-sans flex items-center justify-center">
+        <div className="max-w-md mx-auto text-center p-8">
+          <div className="mb-8">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Connect Your Bank</h2>
+            <p className="text-gray-600 mb-6">
+              To get personalized financial insights and advice, please connect your Australian bank account securely through Basiq.
+            </p>
+          </div>
+          <div className="space-y-4">
+            <ConnectBank 
+              className="w-full py-3 text-base"
+              onConnectionSuccess={() => {
+                // Refresh the page to show the main interface
+                window.location.reload();
+              }}
+            />
+            <div className="text-xs text-gray-500">
+              <p>✓ Bank-level encryption</p>
+              <p>✓ Read-only access</p>
+              <p>✓ Trusted by 100+ Australian financial institutions</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowChat(true)}
+            className="mt-8 text-sm text-gray-400 hover:text-gray-600 transition-colors underline"
+          >
+            Continue with demo data instead
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-white font-sans">
-      <Header onConnectBank={handleConnectBank} />
+      <Header />
       {!showChat ? (
         // Initial Search Interface
         <div className="flex flex-col items-center justify-center flex-1 pt-24">
+          {/* Bank connection status */}
+          {!bankLoading && hasConnectedBanks && accounts.length > 0 && (
+            <div className="mb-4 px-4 py-2 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
+              ✓ {accounts.length} bank account{accounts.length !== 1 ? 's' : ''} connected - Real data will be used for insights
+            </div>
+          )}
           <div className="mt-8 mb-8">
             <h2 className="text-[32px] italic font-medium text-center mb-8 text-black">What do you want to know?</h2>
             <div className="w-[720px] max-w-full mx-auto">
@@ -166,6 +211,10 @@ export default function Home() {
             {/* Pre-prepared prompt blocks - now in a max-width container */}
             <div className="w-full max-w-[1200px] mx-auto flex flex-row flex-wrap gap-4 mt-12 justify-center">
               {[
+                { type: "Spending", prompt: hasConnectedBanks ? "What did I spend on food this week?" : "Analyze my spending patterns" },
+                { type: "Budgeting", prompt: hasConnectedBanks ? "How can I improve my monthly budget based on my spending?" : "How can I create a monthly budget?" },
+                { type: "Tax", prompt: hasConnectedBanks ? "Show me tax-deductible expenses from my transactions" : "How can I save money on tax?" },
+                { type: "Savings", prompt: hasConnectedBanks ? "Based on my income and expenses, how much should I save?" : "How much should I save each month?" },
                 { type: "Spending", prompt: "What did i spend the most money on this week?" },
                 { type: "Budgeting", prompt: "How can I improve my monthly budget?" },
                 { type: "Tax", prompt: "How can i save money on tax?" },

@@ -1,35 +1,50 @@
+"use client";
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import ProfileDropdown from './ProfileDropdown';
+import { ConnectBank } from './ConnectBank';
+import { useAuth } from '../context/AuthContext';
 
-const Header = ({ onConnectBank }: { onConnectBank?: () => void }) => {
-  const handleLogoClick = (e: React.MouseEvent) => {
-    if (window.location.pathname === '/') {
-      e.preventDefault();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    // Otherwise, let Link handle navigation
-  };
+const Header = () => {
+  const { user } = useAuth();
 
   return (
-    <header className="w-full flex items-center justify-between px-8 py-4 bg-white z-20">
-      {/* Brand name */}
-      <div className="flex items-center">
-        <Link href="/" onClick={handleLogoClick} className="text-2xl font-medium text-gray-900 tracking-tight cursor-pointer">
-          Kapital
-        </Link>
-      </div>
+    <header className="w-full flex items-center justify-between px-6 py-4 border-b bg-white shadow-sm z-20">
+      <Link href="/" className="text-2xl font-bold text-primary">
+        onTrack
+      </Link>
+      
       <div className="flex items-center gap-4">
-        <button
-          type="button"
-          onClick={onConnectBank}
-          className="flex items-center gap-3 px-6 py-2 border border-gray-300 rounded-full bg-white text-gray-800 font-medium hover:bg-gray-50 transition text-base shadow-sm"
-        >
-          <span className="text-lg">+</span>
-          <span>Connect bank</span>
-        </button>
-        <ProfileDropdown />
+        {user && (
+          <ConnectBank 
+            onConnectionSuccess={() => {
+              // Optionally refresh page data or show success message
+              console.log('Bank connected successfully!');
+            }}
+          />
+        )}
+        
+        {user ? (
+          // Show profile dropdown for authenticated users
+          <ProfileDropdown />
+        ) : (
+          // Show sign in/sign up buttons for unauthenticated users
+          <div className="flex items-center gap-3">
+            <Link
+              href="/auth"
+              className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+            >
+              Sign in
+            </Link>
+            <Link
+              href="/auth?mode=signup"
+              className="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-lg transition-colors"
+            >
+              Sign up
+            </Link>
+          </div>
+        )}
       </div>
     </header>
   );

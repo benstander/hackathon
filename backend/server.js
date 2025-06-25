@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const setupAppMiddleware = require("./middleware");
+const { setupAppMiddleware } = require("./middleware");
 
 const app = express();
 app.use(express.json());

@@ -1,15 +1,22 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { LoginForm } from '../../components/login-form'
 import { SignupForm } from '../../components/signup-form'
 import { useAuth } from '../../context/AuthContext'
 
 export default function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true)
+  const searchParams = useSearchParams()
+  const mode = searchParams.get('mode')
+  const [isLogin, setIsLogin] = useState(mode !== 'signup')
   const { user, loading } = useAuth()
   const router = useRouter()
+
+  // Update form mode when URL parameter changes
+  useEffect(() => {
+    setIsLogin(mode !== 'signup')
+  }, [mode])
 
   // Redirect if already logged in
   useEffect(() => {
@@ -38,6 +45,15 @@ export default function AuthPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            {isLogin ? 'Welcome back' : 'Create your account'}
+          </h1>
+          <p className="text-gray-600">
+            {isLogin 
+              ? 'Sign in to your account to continue' 
+              : 'Get started with your financial journey'
+            }
+          </p>
         </div>
         
         {isLogin ? (

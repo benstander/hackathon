@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server'
 
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000';
+
 export async function GET(
   request: Request,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
-    const response = await fetch(`http://localhost:3000/api/basiq/user/${params.userId}`)
+    const { userId } = await params;
+    const response = await fetch(`${BACKEND_URL}/api/basiq/user/${userId}`)
     const data = await response.json()
     return NextResponse.json(data)
   } catch (error) {

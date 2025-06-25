@@ -43,7 +43,7 @@ const ProfileDropdown = ({ children }: { children?: ReactNode }) => {
         })
       ) : (
         <button
-          className="py-2 px-2 rounded-full bg-white border border-gray-300 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary"
+          className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary hover:bg-gray-300 transition-colors"
           onClick={() => setOpen((prev) => !prev)}
           aria-label="Account menu"
         >
@@ -54,19 +54,47 @@ const ProfileDropdown = ({ children }: { children?: ReactNode }) => {
         <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
           {user ? (
             <>
-              <Link href="/profile" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Account</Link>
-              <Link href="/settings" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Settings</Link>
+              <div className="px-4 py-2 border-b border-gray-100">
+                <p className="text-sm font-medium text-gray-900">{user.email}</p>
+                <p className="text-xs text-gray-500">Signed in</p>
+              </div>
+              <Link 
+                href="/profile" 
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                onClick={() => setOpen(false)}
+              >
+                Profile
+              </Link>
+              <Link 
+                href="/settings" 
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                onClick={() => setOpen(false)}
+              >
+                Settings
+              </Link>
               <button
                 onClick={handleSignOut}
-                className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
               >
-                Log out
+                Sign out
               </button>
             </>
           ) : (
             <>
-              <Link href="/auth?mode=signin" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Sign In</Link>
-              <Link href="/auth?mode=signup" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Sign Up</Link>
+              <Link 
+                href="/auth" 
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                onClick={() => setOpen(false)}
+              >
+                Sign in
+              </Link>
+              <Link 
+                href="/auth?mode=signup" 
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                onClick={() => setOpen(false)}
+              >
+                Sign up
+              </Link>
             </>
           )}
         </div>
