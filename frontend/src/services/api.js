@@ -40,5 +40,37 @@ export const api = {
       question
     });
     return response.data;
+  },
+
+  // Bank Connection Management
+  
+  // Initialize bank connection
+  initBankConnection: async (userData) => {
+    const response = await axios.post(`${API_BASE_URL}/basiq/connect/init`, userData);
+    return response.data;
+  },
+
+  // Handle connection callback
+  handleConnectionCallback: async (callbackData) => {
+    const response = await axios.post(`${API_BASE_URL}/basiq/connect/callback`, callbackData);
+    return response.data;
+  },
+
+  // Get user's bank connections
+  getUserConnections: async (userId) => {
+    const response = await axios.get(`${API_BASE_URL}/basiq/connections/${userId}`);
+    return response.data;
+  },
+
+  // Get user's bank accounts from database
+  getUserBankAccounts: async (userId) => {
+    const response = await axios.get(`${API_BASE_URL}/basiq/accounts/${userId}`);
+    return response.data;
+  },
+
+  // Sync user's bank data
+  syncUserData: async (userId) => {
+    const response = await axios.post(`${API_BASE_URL}/basiq/sync/${userId}`);
+    return response.data;
   }
 }; 
