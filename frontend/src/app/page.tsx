@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
+import Header from '../components/Header'
 import { useRouter } from 'next/navigation'
 import { ChatInterface } from '../components/ChatInterface'
 import { ConnectBank } from '../components/ConnectBank'
@@ -135,7 +136,6 @@ export default function Home() {
               To get personalized financial insights and advice, please connect your Australian bank account securely through Basiq.
             </p>
           </div>
-          
           <div className="space-y-4">
             <ConnectBank 
               className="w-full py-3 text-base"
@@ -144,14 +144,12 @@ export default function Home() {
                 window.location.reload();
               }}
             />
-            
             <div className="text-xs text-gray-500">
               <p>✓ Bank-level encryption</p>
               <p>✓ Read-only access</p>
               <p>✓ Trusted by 100+ Australian financial institutions</p>
             </div>
           </div>
-          
           <button
             onClick={() => setShowChat(true)}
             className="mt-8 text-sm text-gray-400 hover:text-gray-600 transition-colors underline"
@@ -165,6 +163,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white font-sans">
+      <Header />
       {!showChat ? (
         // Initial Search Interface
         <div className="flex flex-col items-center justify-center flex-1 pt-24">
@@ -174,7 +173,6 @@ export default function Home() {
               ✓ {accounts.length} bank account{accounts.length !== 1 ? 's' : ''} connected - Real data will be used for insights
             </div>
           )}
-          
           <div className="mt-8 mb-8">
             <h2 className="text-[32px] italic font-medium text-center mb-8 text-black">What do you want to know?</h2>
             <div className="w-[720px] max-w-full mx-auto">
@@ -217,6 +215,10 @@ export default function Home() {
                 { type: "Budgeting", prompt: hasConnectedBanks ? "How can I improve my monthly budget based on my spending?" : "How can I create a monthly budget?" },
                 { type: "Tax", prompt: hasConnectedBanks ? "Show me tax-deductible expenses from my transactions" : "How can I save money on tax?" },
                 { type: "Savings", prompt: hasConnectedBanks ? "Based on my income and expenses, how much should I save?" : "How much should I save each month?" },
+                { type: "Spending", prompt: "What did i spend the most money on this week?" },
+                { type: "Budgeting", prompt: "How can I improve my monthly budget?" },
+                { type: "Tax", prompt: "How can i save money on tax?" },
+                { type: "Savings", prompt: "How much should I save each month?" },
               ].map(p => (
                 <button
                   key={p.type + p.prompt}

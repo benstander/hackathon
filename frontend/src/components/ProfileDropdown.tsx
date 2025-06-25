@@ -47,7 +47,7 @@ const ProfileDropdown = ({ children }: { children?: ReactNode }) => {
           onClick={() => setOpen((prev) => !prev)}
           aria-label="Account menu"
         >
-          <Image src="/icons/account-icon.svg" alt="Profile" width={28} height={28} />
+          <Image src="/icons/account-icon.svg" alt="Profile" width={26} height={26} />
         </button>
       )}
       {open && (

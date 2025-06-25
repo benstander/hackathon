@@ -1,6 +1,7 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import ProfileDropdown from './ProfileDropdown';
 import { ConnectBank } from './ConnectBank';
 import { useAuth } from '../context/AuthContext';
