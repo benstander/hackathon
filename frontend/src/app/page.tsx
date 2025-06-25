@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
+import Header from '../components/Header'
 import { useRouter } from 'next/navigation'
 import { ChatInterface } from '../components/ChatInterface'
 import { ConnectBank } from '../components/ConnectBank'
@@ -119,6 +120,7 @@ export default function Home() {
     }
   }
 
+
   // Show bank connection prompt if no banks are connected
   if (!bankLoading && !hasConnectedBanks && !showChat) {
     return (
@@ -161,10 +163,15 @@ export default function Home() {
         </div>
       </div>
     );
+    
+  // Placeholder for connect bank handler
+  const handleConnectBank = () => {
+    alert('Connect bank clicked!')
   }
 
   return (
     <div className="min-h-screen bg-white font-sans">
+      <Header onConnectBank={handleConnectBank} />
       {!showChat ? (
         // Initial Search Interface
         <div className="flex flex-col items-center justify-center flex-1 pt-24">
@@ -217,6 +224,10 @@ export default function Home() {
                 { type: "Budgeting", prompt: hasConnectedBanks ? "How can I improve my monthly budget based on my spending?" : "How can I create a monthly budget?" },
                 { type: "Tax", prompt: hasConnectedBanks ? "Show me tax-deductible expenses from my transactions" : "How can I save money on tax?" },
                 { type: "Savings", prompt: hasConnectedBanks ? "Based on my income and expenses, how much should I save?" : "How much should I save each month?" },
+                { type: "Spending", prompt: "What did i spend the most money on this week?" },
+                { type: "Budgeting", prompt: "How can I improve my monthly budget?" },
+                { type: "Tax", prompt: "How can i save money on tax?" },
+                { type: "Savings", prompt: "How much should I save each month?" },
               ].map(p => (
                 <button
                   key={p.type + p.prompt}
