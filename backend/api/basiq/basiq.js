@@ -1,4 +1,5 @@
 const express = require('express');
+const { authenticateUser } = require('../../middleware');
 const basiqRouter = express.Router();
 const { 
   getAccessToken, 
@@ -8,7 +9,9 @@ const {
   listUserAccounts, 
   retrieveUserAccount, 
   listUserTransactions, 
-  retrieveUserTransaction 
+  retrieveUserTransaction,
+  validateUserId,
+  validateEmail
 } = require('../../Utils/basiqHelper')
 const { 
   createOrUpdateUser,
@@ -36,13 +39,45 @@ basiqRouter.post('/user', async (req, res) => {
   }
 })
 
-// Initialize bank connection for a user
-basiqRouter.post('/connect/init', async (req, res) => {
+// Client token endpoint (from starter kit)
+basiqRouter.get('/client-token', authenticateUser, async (req, res) => {
   try {
-    const { user_id, email, mobile_number, first_name, last_name } = req.body;
+    const { userId } = req.query;
     
-    if (!user_id || !email) {
-      return res.status(400).json({ error: 'User ID and email are required' });
+    // Validate the userId query parameter
+    if (!userId || !validateUserId(userId)) {
+      return res.status(400).json({ 
+        error: 'Invalid or missing userId parameter' 
+      });
+    }
+
+    // Ensure user can only get tokens for their own userId
+    if (userId !== req.user.id) {
+      return res.status(403).json({ 
+        error: 'Access denied - can only get tokens for your own user ID' 
+      });
+    }
+
+    const clientToken = await getClientToken(userId);
+    res.status(200).json(clientToken);
+    
+  } catch (error) {
+    console.error('Client token generation error:', error);
+    res.status(500).json({ 
+      error: 'Failed to generate client token',
+      message: error.message 
+    });
+  }
+});
+
+// Initialize bank connection for a user - NOW REQUIRES AUTHENTICATION
+basiqRouter.post('/connect/init', authenticateUser, async (req, res) => {
+  try {
+    const { email, mobile_number, first_name, last_name } = req.body;
+    const user_id = req.user.id; // Get user ID from authenticated token
+    
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
     }
 
     // Check if user already has a Basiq user ID
@@ -67,10 +102,13 @@ basiqRouter.post('/connect/init', async (req, res) => {
     // Generate client token for Basiq Connect
     const clientToken = await getClientToken(basiqUserId);
 
+    console.log('Basiq Connect URL:', `https://connect.sandbox.basiq.io/?token=${clientToken}`);
+    console.log('Client Token:', clientToken);
+
     res.json({
       basiq_user_id: basiqUserId,
       client_token: clientToken,
-      connect_url: `https://connect.basiq.io/?token=${clientToken}`
+      connect_url: `https://connect.sandbox.basiq.io/?token=${clientToken}`
     });
 
   } catch (error) {
@@ -79,12 +117,13 @@ basiqRouter.post('/connect/init', async (req, res) => {
   }
 });
 
-// Handle connection callback/webhook
-basiqRouter.post('/connect/callback', async (req, res) => {
+// Handle connection callback/webhook - NOW REQUIRES AUTHENTICATION
+basiqRouter.post('/connect/callback', authenticateUser, async (req, res) => {
   try {
-    const { user_id, basiq_user_id, connection_id, institution_id, institution_name, status } = req.body;
+    const { basiq_user_id, connection_id, institution_id, institution_name, status } = req.body;
+    const user_id = req.user.id; // Get user ID from authenticated token
 
-    if (!user_id || !basiq_user_id) {
+    if (!basiq_user_id) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
@@ -144,10 +183,15 @@ async function syncUserAccounts(user_id, basiq_user_id, connection_id) {
   }
 }
 
-// Get user's bank connections
-basiqRouter.get('/connections/:user_id', async (req, res) => {
+// Get user's bank connections - NOW REQUIRES AUTHENTICATION
+basiqRouter.get('/connections/:user_id', authenticateUser, async (req, res) => {
   try {
     const { user_id } = req.params;
+    
+    // Ensure user can only access their own connections
+    if (user_id !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
     
     const connections = await getBankConnectionsByUserId(user_id);
     res.json(connections);
@@ -158,10 +202,15 @@ basiqRouter.get('/connections/:user_id', async (req, res) => {
   }
 });
 
-// Get user's bank accounts
-basiqRouter.get('/accounts/:user_id', async (req, res) => {
+// Get user's bank accounts - NOW REQUIRES AUTHENTICATION
+basiqRouter.get('/accounts/:user_id', authenticateUser, async (req, res) => {
   try {
     const { user_id } = req.params;
+    
+    // Ensure user can only access their own accounts
+    if (user_id !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
     
     const accounts = await getBankAccountsByUserId(user_id);
     res.json(accounts);
@@ -172,10 +221,15 @@ basiqRouter.get('/accounts/:user_id', async (req, res) => {
   }
 });
 
-// Sync/refresh user data
-basiqRouter.post('/sync/:user_id', async (req, res) => {
+// Sync/refresh user data - NOW REQUIRES AUTHENTICATION
+basiqRouter.post('/sync/:user_id', authenticateUser, async (req, res) => {
   try {
     const { user_id } = req.params;
+    
+    // Ensure user can only sync their own data
+    if (user_id !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
     
     const user = await getUserById(user_id);
     if (!user?.basiq_user_id) {

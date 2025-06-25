@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useBankConnection } from '../hooks/useBankConnection';
+import { getClientToken, clearBasiqTokens } from '../lib/basiqClient';
+import { useAuth } from '../context/AuthContext';
 
 interface ConnectBankProps {
   onConnectionSuccess?: () => void;
@@ -15,6 +17,7 @@ declare global {
 }
 
 export function ConnectBank({ onConnectionSuccess, className = '' }: ConnectBankProps) {
+  const { user } = useAuth();
   const {
     hasConnectedBanks,
     connecting,
@@ -53,6 +56,51 @@ export function ConnectBank({ onConnectionSuccess, className = '' }: ConnectBank
     }
 
     try {
+      // First, try to get a client token using the improved flow
+      let clientToken;
+      try {
+        if (user?.id) {
+          clientToken = await getClientToken(user.id);
+        }
+      } catch (tokenError) {
+        console.log('Client token not available, using fallback method');
+      }
+
+      // If we have a client token, use it directly
+      if (clientToken && basiqLoaded) {
+        const basiqConnect = new window.BasiqConnect({
+          token: clientToken,
+          onConnect: (connection: any) => {
+            console.log('Bank connected:', connection);
+            handleConnectionSuccess({
+              basiq_user_id: user?.id, // Use the user ID as Basiq user ID
+              connection_id: connection.id,
+              institution_id: connection.institution?.id,
+              institution_name: connection.institution?.name
+            });
+            setShowModal(false);
+            onConnectionSuccess?.();
+          },
+          onCancel: () => {
+            console.log('Connection cancelled');
+            setShowModal(false);
+          },
+          onError: (error: any) => {
+            console.error('Connection error:', error);
+            setShowModal(false);
+          }
+        });
+
+        setShowModal(true);
+        
+        // Show the widget
+        setTimeout(() => {
+          basiqConnect.open();
+        }, 100);
+        return;
+      }
+
+      // Fallback to the original method
       const response = await initializeConnection();
       
       if (response?.client_token && basiqLoaded) {
@@ -93,6 +141,8 @@ export function ConnectBank({ onConnectionSuccess, className = '' }: ConnectBank
       }
     } catch (err) {
       console.error('Failed to connect bank:', err);
+      // Clear any cached tokens on error
+      clearBasiqTokens();
     }
   };
 

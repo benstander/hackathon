@@ -4,8 +4,8 @@ import './globals.css'
 import { FinancialProvider } from '../context/FinancialContext'
 import { AuthProvider } from '../context/AuthContext'
 import Header from '../components/Header'
-import { StagewiseToolbar } from "@stagewise/toolbar-next";
-import { ReactPlugin } from "@stagewise-plugins/react";
+// import { StagewiseToolbar } from "@stagewise/toolbar-next";
+// import { ReactPlugin } from "@stagewise-plugins/react";
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -30,7 +30,7 @@ export default function RootLayout({
             </div>
           </FinancialProvider>
         </AuthProvider>
-        <StagewiseToolbar config={{ plugins: [ReactPlugin] }} />
+        {/* <StagewiseToolbar config={{ plugins: [ReactPlugin] }} /> */}
       </body>
     </html>
   )
