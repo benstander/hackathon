@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
+import Header from '../components/Header'
 import { useRouter } from 'next/navigation'
 import { ChatInterface } from '../components/ChatInterface'
 import { api } from '../services/api'
@@ -116,8 +117,14 @@ export default function Home() {
     }
   }
 
+  // Placeholder for connect bank handler
+  const handleConnectBank = () => {
+    alert('Connect bank clicked!')
+  }
+
   return (
     <div className="min-h-screen bg-white font-sans">
+      <Header onConnectBank={handleConnectBank} />
       {!showChat ? (
         // Initial Search Interface
         <div className="flex flex-col items-center justify-center flex-1 pt-24">
@@ -159,7 +166,7 @@ export default function Home() {
             {/* Pre-prepared prompt blocks - now in a max-width container */}
             <div className="w-full max-w-[1200px] mx-auto flex flex-row flex-wrap gap-4 mt-12 justify-center">
               {[
-                { type: "Spending", prompt: "What did i spend on food this week?" },
+                { type: "Spending", prompt: "What did i spend the most money on this week?" },
                 { type: "Budgeting", prompt: "How can I improve my monthly budget?" },
                 { type: "Tax", prompt: "How can i save money on tax?" },
                 { type: "Savings", prompt: "How much should I save each month?" },

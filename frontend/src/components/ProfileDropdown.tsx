@@ -43,15 +43,15 @@ const ProfileDropdown = ({ children }: { children?: ReactNode }) => {
         })
       ) : (
         <button
-          className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary"
+          className="py-2 px-2 rounded-full bg-white border border-gray-300 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary"
           onClick={() => setOpen((prev) => !prev)}
           aria-label="Account menu"
         >
-          <Image src="/icons/account-icon.svg" alt="Profile" width={28} height={28} />
+          <Image src="/icons/account-icon.svg" alt="Profile" width={26} height={26} />
         </button>
       )}
       {open && (
-        <div className="absolute right-0 bottom-full mb-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
+        <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
           {user ? (
             <>
               <Link href="/profile" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Account</Link>
